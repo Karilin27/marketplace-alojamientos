@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión | Marketplace</title>
-
     <link rel="stylesheet" href="../css/login.css">
     <script src="../js/login.js" defer></script>
 </head>
-
 <body>
 
     <main class="login-container">
@@ -21,24 +19,26 @@
                 <p>Ingresa a tu cuenta del Marketplace</p>
             </div>
 
-            <form id="loginForm" novalidate>
+            <form id="loginForm">
 
+              
                 <div class="form-group">
                     <label for="correo">Correo electrónico</label>
-
                     <input
-                        type="text"
+                        type="email"
                         id="correo"
                         name="correo"
                         placeholder="ejemplo@correo.com"
                         autocomplete="email"
+                        pattern="[A-Za-z0-9_%+-]+([.][A-Za-z0-9_%+-]+)*@([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?[.])+[A-Za-z]{2,}"
+                        title="Ingresa un correo válido, por ejemplo usuario@gmail.com o usuario@gmail.co"
                         required
                     >
                 </div>
 
+
                 <div class="form-group">
                     <label for="contrasena">Contraseña</label>
-
                     <input
                         type="password"
                         id="contrasena"
