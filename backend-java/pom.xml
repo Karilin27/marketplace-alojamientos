@@ -16,7 +16,10 @@
   <name>marketplace-reservas</name>
   <description>S3 Reservas y disponibilidad, S4 Pagos, S5 Notificaciones y logs (Kevin Rojas)</description>
 
-  
+  <!-- NOTA: si Juliana/Kariana ya tienen un pom.xml multi-módulo para S1 y S2, copiar solo las
+       dependencias y los paquetes edu.unbosque.marketplace.{common,logs,reservas,pagos,notificaciones,tareas}
+       dentro de ese proyecto (un solo desplegable Spring Boot, ver página 10 de Confluence). -->
+
   <properties>
     <java.version>17</java.version>
     <stripe.version>26.12.0</stripe.version>

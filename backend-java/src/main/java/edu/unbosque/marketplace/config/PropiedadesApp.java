@@ -19,8 +19,5 @@ public record PropiedadesApp(
         @DefaultValue("simulada") String pasarela,
         String stripeApiKey,
         @DefaultValue("cop") String moneda,
-        @DefaultValue("America/Bogota") String zona,
-        /** URL base de S6 (FastAPI) para POST /api/internal/audit-events; vacío = no publicar. */
-        String auditoriaUrl,
-        String serviceKey) {
+        @DefaultValue("America/Bogota") String zona) {
 }

@@ -34,7 +34,7 @@ public class CatalogoRepositorio {
                   FROM reservas.v_alojamiento WHERE id = ?""", (rs, n) -> new Alojamiento(
                 rs.getObject("id", UUID.class),
                 rs.getObject("id_anfitrion", UUID.class),
-                "PUBLICADO".equals(rs.getString("estado_publicacion")),
+                "ACTIVA".equals(rs.getString("estado_publicacion")),
                 new DatosTarifa(rs.getBigDecimal("precio_base"), rs.getBigDecimal("tarifa_limpieza"),
                         rs.getBigDecimal("descuento_pct"), rs.getInt("descuento_min_noches"), tarifaServicioPct,
                         rs.getInt("capacidad")),
