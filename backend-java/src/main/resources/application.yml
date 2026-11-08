@@ -26,8 +26,6 @@ marketplace:
   stripe-api-key: ${STRIPE_API_KEY:}      # solo sk_test_...
   moneda: ${MONEDA:cop}
   zona: ${ZONA_HORARIA:America/Bogota}
-  auditoria-url: ${AUDITORIA_URL:}        # URL base de S6, p. ej. https://marketplace-admin.onrender.com
-  service-key: ${SERVICE_KEY:}            # cabecera X-Service-Key hacia S6
 
 management:
   endpoints:
