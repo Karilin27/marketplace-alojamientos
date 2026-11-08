@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disponibilidad del alojamiento · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="disponibilidad"></header>
+  <main>
+    <h1>Disponibilidad del alojamiento</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <section class="card"><h2>Periodos registrados</h2>
+      <div id="filas"></div>
+      <div class="acciones"><button class="secundario" id="agregar" type="button">+ Agregar periodo</button><button id="guardar" type="button">Guardar cambios</button></div>
+      <p class="suave">Los días reservados por huéspedes se muestran abajo y no se pueden bloquear.</p></section>
+    <section class="card"><h2>Reservado por huéspedes</h2><ul class="lista" id="reservados"><li class="suave">Cargando…</li></ul></section>
+  </main>
+  <script src="../../js/reservas/config.js"></script>
+  <script src="../../js/reservas/logica.js"></script>
+  <script src="../../js/reservas/api.js"></script>
+  <script src="../../js/reservas/nav.js"></script>
+  <script src="../../js/reservas/disponibilidad.js"></script>
+</body>
+</html>

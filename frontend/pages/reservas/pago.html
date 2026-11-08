@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pago de la reserva · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="pago"></header>
+  <main>
+    <h1>Pago de la reserva</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <section class="card" id="resumen" aria-live="polite">Cargando…</section>
+    <form id="form" class="card oculto" novalidate>
+      <h2>Método de pago (modo de prueba)</h2>
+      <p class="suave">No se pide ningún número de tarjeta: el pago es simulado con métodos de prueba.</p>
+      <label for="metodo">Método</label>
+      <select id="metodo">
+        <option value="pm_card_visa">Visa de prueba — aprobada</option>
+        <option value="pm_card_chargeDeclined">Tarjeta de prueba — rechazada</option>
+        <option value="pm_card_chargeDeclinedInsufficientFunds">Tarjeta de prueba — fondos insuficientes</option>
+      </select>
+      <div class="acciones"><button type="submit" id="btn-pagar">Pagar</button></div>
+    </form>
+  </main>
+  <script src="../../js/reservas/config.js"></script>
+  <script src="../../js/reservas/logica.js"></script>
+  <script src="../../js/reservas/api.js"></script>
+  <script src="../../js/reservas/nav.js"></script>
+  <script src="../../js/reservas/pago.js"></script>
+</body>
+</html>
