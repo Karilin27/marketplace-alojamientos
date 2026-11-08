@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notificaciones · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="notificaciones"></header>
+  <main>
+    <h1>Notificaciones</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="solo" style="width:auto"> Solo no leídas</label>
+    <ul class="lista card" id="lista"><li class="suave">Cargando…</li></ul>
+    <div class="acciones"><button class="secundario oculto" id="mas">Ver más</button></div>
+  </main>
+  <script src="../../js/reservas/config.js"></script>
+  <script src="../../js/reservas/logica.js"></script>
+  <script src="../../js/reservas/api.js"></script>
+  <script src="../../js/reservas/nav.js"></script>
+  <script src="../../js/reservas/notificaciones.js"></script>
+</body>
+</html>
