@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- El logger "eventos" ya escribe una línea JSON completa (HU-026): se imprime sin prefijo para que cada línea sea JSON válido. -->
+<configuration>
+  <appender name="EVENTOS" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder><pattern>%msg%n</pattern></encoder>
+  </appender>
+  <appender name="CONSOLA" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder><pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level %logger{36} - %msg%n</pattern></encoder>
+  </appender>
+
+  <logger name="eventos" level="INFO" additivity="false">
+    <appender-ref ref="EVENTOS"/>
+  </logger>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLA"/>
+  </root>
+</configuration>
