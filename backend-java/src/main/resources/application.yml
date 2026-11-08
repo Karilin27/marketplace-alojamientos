@@ -1,0 +1,36 @@
+# Configuración de S3/S4/S5. Los secretos NUNCA se escriben aquí: vienen de variables de entorno (Render / GitHub Secrets).
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: marketplace-reservas
+  datasource:
+    # Supabase -> Project Settings -> Database -> Connection string (modo pooler, puerto 6543 o 5432)
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/marketplace}
+    username: ${DATABASE_USER:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 5
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false
+
+marketplace:
+  jwt-secret: ${JWT_SECRET:}
+  cotizacion-secret: ${COTIZACION_SECRET:}
+  tarifa-servicio-pct-por-defecto: ${TARIFA_SERVICIO_PCT:10}
+  retencion-pago-minutos: ${RETENCION_PAGO_MINUTOS:15}
+  pasarela: ${PASARELA:simulada}          # simulada | stripe
+  stripe-api-key: ${STRIPE_API_KEY:}      # solo sk_test_...
+  moneda: ${MONEDA:cop}
+  zona: ${ZONA_HORARIA:America/Bogota}
+  auditoria-url: ${AUDITORIA_URL:}        # URL base de S6, p. ej. https://marketplace-admin.onrender.com
+  service-key: ${SERVICE_KEY:}            # cabecera X-Service-Key hacia S6
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
