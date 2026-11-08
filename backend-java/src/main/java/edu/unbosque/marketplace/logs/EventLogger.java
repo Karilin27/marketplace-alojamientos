@@ -38,7 +38,7 @@ public class EventLogger {
         escribir(NivelLog.ERROR, evento, usuario, entidad, idEntidad, resultado, detalle);
     }
 
-    /** Evento relevante para auditoría: se registra en el log y además se publica a S6. */
+    /** Evento relevante para auditoría: se registra en el log y además se entrega al módulo S6 (auditoría). */
     public void auditado(String evento, String usuario, String entidad, String idEntidad, String resultado,
                          Map<String, Object> detalle) {
         escribir("EXITO".equals(resultado) ? NivelLog.INFO : NivelLog.WARN, evento, usuario, entidad, idEntidad,
