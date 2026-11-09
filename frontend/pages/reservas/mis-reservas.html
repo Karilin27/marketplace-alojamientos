@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis reservas · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="mis-reservas"></header>
+  <main>
+    <h1>Mis reservas</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <ul class="lista card" id="lista"><li class="suave">Cargando…</li></ul>
+    <div class="acciones"><button class="secundario oculto" id="mas">Ver más</button></div>
+    <dialog id="dlg-cancelar" class="card" aria-labelledby="t-dlg">
+      <h2 id="t-dlg">Cancelar reserva</h2>
+      <p id="dlg-texto"></p>
+      <label for="motivo">Motivo (opcional)</label><textarea id="motivo" rows="2" maxlength="300"></textarea>
+      <div class="acciones"><button class="peligro" id="dlg-ok">Sí, cancelar</button><button class="secundario" id="dlg-no">Volver</button></div>
+    </dialog>
+  </main>
+  <script src="../../js/reservas/config.js"></script>
+  <script src="../../js/reservas/logica.js"></script>
+  <script src="../../js/reservas/api.js"></script>
+  <script src="../../js/reservas/nav.js"></script>
+  <script src="../../js/reservas/mis-reservas.js"></script>
+</body>
+</html>
