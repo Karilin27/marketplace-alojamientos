@@ -83,6 +83,20 @@ button:hover {
     background: #1b304d;
 }
 
+button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+#btnReactivar {
+    margin-top: 12px;
+    background: #18794e;
+}
+
+#btnReactivar:hover {
+    background: #11603d;
+}
+
 #mensaje {
     color: #c0392b;
     font-size: 13px;

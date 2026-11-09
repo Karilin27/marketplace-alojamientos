@@ -29,6 +29,11 @@ class FiltroAutenticacionTest {
     }
 
     @Test
+    void inicioDeSesionEsPublico() throws Exception {
+        assertEquals(HttpServletResponse.SC_OK, estadoSinToken("POST", "/api/auth/login"));
+    }
+
+    @Test
     void lasDemasRutasSiguenExigiendoToken() throws Exception {
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, estadoSinToken("GET", "/api/users/me"));
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, estadoSinToken("GET", "/api/auth/register"));

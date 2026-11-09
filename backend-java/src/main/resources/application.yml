@@ -19,6 +19,7 @@ spring:
 
 marketplace:
   jwt-secret: ${JWT_SECRET:}
+  jwt-horas: ${JWT_HORAS:8}               # vigencia del token que emite el login (HU-002)
   cotizacion-secret: ${COTIZACION_SECRET:}
   tarifa-servicio-pct-por-defecto: ${TARIFA_SERVICIO_PCT:10}
   retencion-pago-minutos: ${RETENCION_PAGO_MINUTOS:15}
