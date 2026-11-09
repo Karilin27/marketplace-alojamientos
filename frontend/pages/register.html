@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crear cuenta | Marketplace</title>
+
+    <link rel="stylesheet" href="../css/register.css">
+    <script src="../js/config.js" defer></script>
+    <script src="../js/register.js" defer></script>
+</head>
+
+<body>
+
+    <main class="register-container">
+
+        <section class="register-card">
+
+            <div class="register-header">
+                <h1>Crear cuenta</h1>
+                <p>Únete al Marketplace de alojamientos</p>
+            </div>
+
+            <form id="registerForm" novalidate>
+
+                <!-- Nombre -->
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ingresa tu nombre completo"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <!-- Correo -->
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+
+                    <input
+                        type="text"
+                        id="correo"
+                        name="correo"
+                        placeholder="ejemplo@correo.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <!-- Contraseña -->
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+
+                    <input
+                        type="password"
+                        id="contrasena"
+                        name="contrasena"
+                        placeholder="Mínimo 8 caracteres"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <!-- Rol -->
+                <div class="form-group">
+                    <label for="rol">Tipo de cuenta</label>
+
+                    <select id="rol" name="rol" required>
+                        <option value="">Selecciona tu tipo de cuenta</option>
+                        <option value="HUESPED">Huésped</option>
+                        <option value="ANFITRION">Anfitrión</option>
+                    </select>
+                </div>
+
+                <!-- Mensajes -->
+                <p id="mensaje" role="alert" aria-live="polite"></p>
+
+                <!-- Botón -->
+                <button type="submit" id="btnRegistro">
+                    Crear cuenta
+                </button>
+
+            </form>
+
+            <p class="login-link">
+                ¿Ya tienes una cuenta?
+                <a href="login.html">Inicia sesión</a>
+            </p>
+
+        </section>
+
+    </main>
+
+</body>
+</html>
