@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Clock;
+import java.util.Set;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -29,10 +30,14 @@ public class FiltroAutenticacion extends OncePerRequestFilter {
         this.reloj = reloj;
     }
 
+    /** Rutas POST que no exigen token: crear cuenta (HU-001). */
+    private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register");
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
         String ruta = req.getRequestURI();
-        boolean publica = "GET".equals(req.getMethod()) && ruta.startsWith("/api/availability/");
+        boolean publica = ("GET".equals(req.getMethod()) && ruta.startsWith("/api/availability/"))
+                || ("POST".equals(req.getMethod()) && POST_PUBLICAS.contains(ruta));
         return !ruta.startsWith("/api/") || publica || "OPTIONS".equals(req.getMethod());
     }
 

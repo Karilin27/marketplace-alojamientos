@@ -7,11 +7,12 @@ const contrasena = document.getElementById("contrasena");
 const rol = document.getElementById("rol");
 
 const mensaje = document.getElementById("mensaje");
+const boton = document.getElementById("btnRegistro");
 
-// Validar formato del correo
+// Validar formato del correo (mismo patrón que el login y el backend)
 function correoValido(valor) {
 
-    const patron = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+    const patron = /^[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$/;
 
     return patron.test(valor);
 }
@@ -26,7 +27,7 @@ function mostrarMensaje(texto, tipo = "error") {
 }
 
 // Procesar el registro
-formulario.addEventListener("submit", function(event) {
+formulario.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
@@ -76,6 +77,13 @@ formulario.addEventListener("submit", function(event) {
         return;
     }
 
+    if (new TextEncoder().encode(valorContrasena).length > 72) {
+
+        mostrarMensaje("La contraseña no puede superar 72 caracteres.");
+        contrasena.focus();
+        return;
+    }
+
     // CA-02: validar rol
     if (valorRol === "") {
 
@@ -92,16 +100,39 @@ formulario.addEventListener("submit", function(event) {
         return;
     }
 
-    // Validaciones del frontend completadas
-    mostrarMensaje(
-        "Los datos son válidos. El siguiente paso es conectar el registro con el servidor.",
-        "exito"
-    );
+    // Enviar al backend: POST /api/auth/register
+    boton.disabled = true;
+    mostrarMensaje("Creando tu cuenta...", "exito");
 
-    console.log("Datos del formulario validados:", {
-        nombre: valorNombre,
-        correo: valorCorreo,
-        rol: valorRol
-    });
+    try {
+        const { ok, datos } = await postJson("/api/auth/register", {
+            nombre: valorNombre,
+            correo: valorCorreo,
+            contrasena: valorContrasena,
+            rol: valorRol
+        });
+
+        if (ok) {
+            // CA-01: registro exitoso
+            mostrarMensaje("Cuenta creada correctamente. Redirigiendo al inicio de sesión...", "exito");
+            formulario.reset();
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1500);
+            return;
+        }
+
+        // 400 datos inválidos, 409 correo ya registrado, 5xx error del servidor
+        mostrarMensaje(textoDeError(datos, "No fue posible completar el registro. Intenta de nuevo."));
+
+        if (datos && datos.codigo === "CORREO_YA_REGISTRADO") {
+            correo.focus();
+        }
+
+    } catch (error) {
+        mostrarMensaje(error.message);
+    } finally {
+        boton.disabled = false;
+    }
 
 });
