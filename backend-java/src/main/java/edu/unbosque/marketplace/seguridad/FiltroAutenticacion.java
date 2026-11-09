@@ -30,8 +30,8 @@ public class FiltroAutenticacion extends OncePerRequestFilter {
         this.reloj = reloj;
     }
 
-    /** Rutas POST que no exigen token: crear cuenta (HU-001). */
-    private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register");
+    /** Rutas POST que no exigen token: crear cuenta (HU-001) e iniciar sesión (HU-002). */
+    private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register", "/api/auth/login");
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
