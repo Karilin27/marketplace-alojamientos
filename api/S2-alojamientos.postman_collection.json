@@ -1,0 +1,1209 @@
+{
+  "info": {
+    "name": "S2 Alojamientos – Marketplace Inversiones LR",
+    "description": "HU-005, HU-006, HU-007, HU-009, HU-010, HU-023 y HU-024. Casos de prueba de la página 19 de Confluence. Ejecutar en orden: newman run api/S2-alojamientos.postman_collection.json --env-var baseUrl=http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "0.1 Registrar anfitrión de prueba",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"correoAnfitrion\", \"anf\" + Date.now() + \"@test.com\");",
+              "pm.collectionVariables.set(\"correoOtro\", \"otro\" + Date.now() + \"@test.com\");",
+              "pm.collectionVariables.set(\"correoHuesped\", \"hue\" + Date.now() + \"@test.com\");"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Anfitrión Postman\",\n  \"correo\": \"{{correoAnfitrion}}\",\n  \"contrasena\": \"Clave2026*\",\n  \"rol\": \"ANFITRION\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.2 Iniciar sesión anfitrión",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"tokenAnfitrion\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correoAnfitrion}}\",\n  \"contrasena\": \"Clave2026*\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.3 Registrar otro anfitrión (no dueño)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Otro Anfitrión\",\n  \"correo\": \"{{correoOtro}}\",\n  \"contrasena\": \"Clave2026*\",\n  \"rol\": \"ANFITRION\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.4 Iniciar sesión otro anfitrión",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"tokenOtro\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correoOtro}}\",\n  \"contrasena\": \"Clave2026*\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.5 Registrar huésped",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Huésped Postman\",\n  \"correo\": \"{{correoHuesped}}\",\n  \"contrasena\": \"Clave2026*\",\n  \"rol\": \"HUESPED\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.6 Iniciar sesión huésped",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"tokenHuesped\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correoHuesped}}\",\n  \"contrasena\": \"Clave2026*\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-023 CA-01 · Listar políticas (CP-05-04)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const p = pm.response.json();",
+              "pm.test(\"Tres políticas\", () => pm.expect(p.map(x => x.nombre)).to.have.members([\"FLEXIBLE\",\"MODERADA\",\"ESTRICTA\"]));",
+              "pm.collectionVariables.set(\"idModerada\", p.find(x => x.nombre === \"MODERADA\").id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cancellation-policies",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cancellation-policies"
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-005 CP-05-02 · Capacidad y precio inválidos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Indica ambos campos\", () => { const d = pm.response.json().detalles.join(\" \"); pm.expect(d).to.include(\"capacidad\"); pm.expect(d).to.include(\"precioPorNoche\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 0,\n  \"precioPorNoche\": -100,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-005 CP-05-03 · Un huésped no puede publicar",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenHuesped}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 4,\n  \"precioPorNoche\": 200000,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-005 CP-05-01 · Crear A-01 en BORRADOR",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const a = pm.response.json();",
+              "pm.test(\"BORRADOR y asociada al anfitrión\", () => { pm.expect(a.estado).to.eql(\"BORRADOR\"); pm.expect(a.politicaCancelacion.nombre).to.eql(\"MODERADA\"); });",
+              "pm.collectionVariables.set(\"idA01\", a.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 4,\n  \"precioPorNoche\": 200000,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-005 · Crear A-02 sin imágenes ni política",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set(\"idA02\", pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Casa Salitre\",\n  \"descripcion\": \"Casa familiar\",\n  \"tipo\": \"CASA\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Carrera 68 # 24-10\",\n  \"capacidad\": 5,\n  \"precioPorNoche\": 250000\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-024 CP-05-05 · Tarifa negativa",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/pricing",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "pricing"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tarifaLimpieza\": -50000,\n  \"descuentoPct\": 10,\n  \"descuentoMinNoches\": 7,\n  \"serviciosAdicionales\": []\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-024 CP-05-09 · Tarifas de alojamiento ajeno",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOtro}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/pricing",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "pricing"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tarifaLimpieza\": 0,\n  \"descuentoPct\": 0,\n  \"descuentoMinNoches\": 0,\n  \"serviciosAdicionales\": []\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-024 CP-05-04 · Configurar tarifas de A-01",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const a = pm.response.json();",
+              "pm.test(\"Tarifas guardadas\", () => { pm.expect(Number(a.tarifaLimpieza)).to.eql(50000); pm.expect(Number(a.descuentoPct)).to.eql(10); pm.expect(a.serviciosAdicionales[0].nombre).to.eql(\"Desayuno\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/pricing",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "pricing"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tarifaLimpieza\": 50000,\n  \"descuentoPct\": 10,\n  \"descuentoMinNoches\": 7,\n  \"serviciosAdicionales\": [\n    {\n      \"nombre\": \"Desayuno\",\n      \"costo\": 30000\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-007 CP-06-02 · Activar A-02 incompleta",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));",
+              "pm.test(\"Lista lo que falta\", () => pm.expect(pm.response.json().detalles.join(\" \")).to.include(\"politicaCancelacion\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA02}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA02}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"ACTIVA\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-007 CP-06-06 · Otro anfitrión no cambia el estado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOtro}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"ACTIVA\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-007 CP-06-01 · Activar A-01",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"BORRADOR → ACTIVA\", () => { const r = pm.response.json(); pm.expect(r.estadoAnterior).to.eql(\"BORRADOR\"); pm.expect(r.estadoNuevo).to.eql(\"ACTIVA\"); pm.expect(r.fecha).to.be.a(\"string\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"ACTIVA\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-007 CA-09 · Mis publicaciones",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Incluye A-01 y A-02\", () => pm.expect(pm.response.json().length).to.eql(2));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/mine",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "mine"
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-009 CP-08-01 · Buscar con filtros",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const r = pm.response.json();",
+              "pm.test(\"Aparece A-01 con datos para comparar\", () => { const a = r.items.find(x => x.id === pm.collectionVariables.get(\"idA01\")); pm.expect(a).to.be.an(\"object\"); pm.expect(a).to.include.keys(\"titulo\",\"imagen\",\"ciudad\",\"tipo\",\"capacidad\",\"precioPorNoche\"); });",
+              "pm.test(\"A-02 (BORRADOR) no aparece\", () => pm.expect(r.items.map(x => x.id)).to.not.include(pm.collectionVariables.get(\"idA02\")));"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };",
+              "pm.collectionVariables.set(\"llegada\", d(30));",
+              "pm.collectionVariables.set(\"salida\", d(33));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?ciudad=Bogotá&llegada={{llegada}}&salida={{salida}}&huespedes=2&tipo=APARTAMENTO&precioMin=100000&precioMax=300000&servicios=WiFi",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Bogotá"
+            },
+            {
+              "key": "llegada",
+              "value": "{{llegada}}"
+            },
+            {
+              "key": "salida",
+              "value": "{{salida}}"
+            },
+            {
+              "key": "huespedes",
+              "value": "2"
+            },
+            {
+              "key": "tipo",
+              "value": "APARTAMENTO"
+            },
+            {
+              "key": "precioMin",
+              "value": "100000"
+            },
+            {
+              "key": "precioMax",
+              "value": "300000"
+            },
+            {
+              "key": "servicios",
+              "value": "WiFi"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-009 CP-08-03 · Capacidad",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"A-01 (capacidad 4) no aparece\", () => pm.expect(pm.response.json().items.map(x => x.id)).to.not.include(pm.collectionVariables.get(\"idA01\")));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?ciudad=Bogotá&huespedes=6",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Bogotá"
+            },
+            {
+              "key": "huespedes",
+              "value": "6"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-009 CP-08-04 · Precios cruzados",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?precioMin=300000&precioMax=100000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ],
+          "query": [
+            {
+              "key": "precioMin",
+              "value": "300000"
+            },
+            {
+              "key": "precioMax",
+              "value": "100000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-009 CP-08-05 · Sin resultados",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Lista vacía\", () => pm.expect(pm.response.json().items).to.have.length(0));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?ciudad=Leticia",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Leticia"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-010 CP-09-01 · Detalle de A-01",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const a = pm.response.json();",
+              "pm.test(\"Detalle completo\", () => { pm.expect(a.titulo).to.eql(\"Apartamento Chapinero\"); pm.expect(a.imagenes).to.have.length(3); pm.expect(a.politicaCancelacion.nombre).to.eql(\"MODERADA\"); pm.expect(a.serviciosAdicionales[0].nombre).to.eql(\"Desayuno\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-010 CP-09-03 · Detalle de A-02 (BORRADOR)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA02}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA02}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-006 CP-05-09 · Editar publicación ajena",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenOtro}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 4,\n  \"precioPorNoche\": 200000,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-006 CP-05-07 · Cambiar el título de A-01 (ACTIVA)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Pasa a PENDIENTE_REVISION\", () => pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE_REVISION\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero Alto\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 4,\n  \"precioPorNoche\": 200000,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-007 CP-06-05 · Activar una publicación en revisión",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 422\", () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations/{{idA01}}/status",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations",
+            "{{idA01}}",
+            "status"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"estado\": \"ACTIVA\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-009 · En revisión ya no aparece en búsquedas",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"A-01 no aparece\", () => pm.expect(pm.response.json().items.map(x => x.id)).to.not.include(pm.collectionVariables.get(\"idA01\")));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations?ciudad=Bogotá",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ],
+          "query": [
+            {
+              "key": "ciudad",
+              "value": "Bogotá"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
