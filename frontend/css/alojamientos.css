@@ -1,0 +1,21 @@
+/* S2 — complementa css/reservas.css (mismos colores y componentes). */
+.resultados { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.tarjeta { background: var(--card); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; box-shadow: var(--sombra); display: flex; flex-direction: column; }
+.tarjeta img, .sin-imagen { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--borde); display: block; }
+.sin-imagen { display: grid; place-items: center; color: var(--suave); font-size: .9rem; }
+.tarjeta .cuerpo { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.tarjeta .precio { font-weight: 700; margin-top: auto; }
+.galeria { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-bottom: 16px; }
+.galeria img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.chips li { border: 1px solid var(--borde); border-radius: 999px; padding: 2px 10px; font-size: .9rem; }
+.casillas { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; }
+.casillas label { display: flex; gap: 6px; align-items: center; font-weight: 400; margin: 0; }
+.casillas input { width: auto; }
+.adicional { display: grid; grid-template-columns: 1fr 140px auto; gap: 8px; align-items: end; margin-top: 8px; }
+.estado { font-size: .85rem; font-weight: 600; border-radius: 999px; padding: 2px 10px; border: 1px solid var(--borde); }
+.estado.ACTIVA { color: var(--ok); border-color: var(--ok); }
+.estado.PENDIENTE_REVISION, .estado.PAUSADA { color: var(--warn); border-color: var(--warn); }
+.estado.BLOQUEADA { color: var(--bad); border-color: var(--bad); }
+.paginador { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 16px; }
+@media (max-width: 480px) { .adicional { grid-template-columns: 1fr; } }

@@ -33,10 +33,18 @@ public class FiltroAutenticacion extends OncePerRequestFilter {
     /** Rutas POST que no exigen token: crear cuenta (HU-001) e iniciar sesión (HU-002). */
     private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register", "/api/auth/login");
 
+    /** Rutas GET que no exigen token: buscar alojamientos (HU-009) y políticas de cancelación (HU-023). */
+    private static final Set<String> GET_PUBLICAS = Set.of("/api/accommodations", "/api/cancellation-policies");
+
+    /** Detalle público de un alojamiento (HU-010): /api/accommodations/{uuid}, pero no /api/accommodations/mine. */
+    private static final java.util.regex.Pattern DETALLE_ALOJAMIENTO = java.util.regex.Pattern.compile(
+            "^/api/accommodations/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
         String ruta = req.getRequestURI();
-        boolean publica = ("GET".equals(req.getMethod()) && ruta.startsWith("/api/availability/"))
+        boolean publica = ("GET".equals(req.getMethod()) && (ruta.startsWith("/api/availability/")
+                        || GET_PUBLICAS.contains(ruta) || DETALLE_ALOJAMIENTO.matcher(ruta).matches()))
                 || ("POST".equals(req.getMethod()) && POST_PUBLICAS.contains(ruta));
         return !ruta.startsWith("/api/") || publica || "OPTIONS".equals(req.getMethod());
     }
