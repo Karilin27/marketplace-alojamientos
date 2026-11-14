@@ -31,7 +31,7 @@ public class FiltroAutenticacion extends OncePerRequestFilter {
     }
 
     /** Rutas POST que no exigen token: crear cuenta (HU-001) e iniciar sesión (HU-002). */
-    private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register", "/api/auth/login");
+    private static final Set<String> POST_PUBLICAS = Set.of("/api/auth/register", "/api/auth/login", "/api/auth/password-recovery", "/api/auth/password-reset");
 
     /** Rutas GET que no exigen token: buscar alojamientos (HU-009), políticas (HU-023) y reseñas visibles (HU-017 CA-06). */
     private static final Set<String> GET_PUBLICAS = Set.of("/api/accommodations", "/api/cancellation-policies", "/api/reviews");

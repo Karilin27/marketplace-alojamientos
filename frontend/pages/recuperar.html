@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar acceso | Marketplace</title>
+    <link rel="stylesheet" href="../css/login.css">
+    <script src="../js/config.js" defer></script>
+    <script src="../js/recuperar.js" defer></script>
+</head>
+<body>
+    <main class="login-container">
+        <section class="login-card">
+            <div class="login-header">
+                <h1>Recuperar acceso</h1>
+                <p id="subtitulo">Ingresa tu correo y te daremos un enlace para crear una nueva contraseña.</p>
+            </div>
+
+            <!-- Paso 1: solicitar el token (HU-003 CA-01, CA-02) -->
+            <form id="formSolicitar" novalidate>
+                <div class="form-group">
+                    <label for="correo">Correo electrónico</label>
+                    <input type="email" id="correo" placeholder="ejemplo@correo.com" autocomplete="email" required>
+                </div>
+                <p id="mensajeSolicitar" role="alert"></p>
+                <button type="submit" id="btnSolicitar">Solicitar enlace</button>
+            </form>
+
+            <!-- Paso 2: nueva contraseña con el token (HU-003 CA-03, CA-04) -->
+            <form id="formRestablecer" novalidate hidden>
+                <div class="form-group">
+                    <label for="token">Código de recuperación</label>
+                    <input type="text" id="token" autocomplete="one-time-code" required>
+                </div>
+                <div class="form-group">
+                    <label for="nueva">Nueva contraseña (mínimo 8 caracteres)</label>
+                    <input type="password" id="nueva" autocomplete="new-password" minlength="8" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmar">Confirmar contraseña</label>
+                    <input type="password" id="confirmar" autocomplete="new-password" required>
+                </div>
+                <p id="mensajeRestablecer" role="alert"></p>
+                <button type="submit" id="btnRestablecer">Cambiar contraseña</button>
+            </form>
+
+            <p class="register-link"><a href="login.html">Volver a iniciar sesión</a></p>
+        </section>
+    </main>
+</body>
+</html>

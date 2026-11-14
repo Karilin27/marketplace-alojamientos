@@ -54,6 +54,18 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <!-- S6 HU-021: exportación de reportes a Excel (.xlsx) -->
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.5</version>
+    </dependency>
+    <dependency>
+      <!-- S6 HU-021: exportación de reportes a PDF -->
+      <groupId>com.github.librepdf</groupId>
+      <artifactId>openpdf</artifactId>
+      <version>1.3.30</version>
+    </dependency>
+    <dependency>
       <groupId>com.stripe</groupId>
       <artifactId>stripe-java</artifactId>
       <version>${stripe.version}</version>

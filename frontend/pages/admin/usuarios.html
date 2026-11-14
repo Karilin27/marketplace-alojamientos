@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuarios · Administración · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="usuarios"></header>
+  <main style="max-width:1140px">
+    <h1>Usuarios</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <div data-contenido>
+      <form class="card" id="filtros" novalidate>
+        <div class="fila">
+          <div><label for="buscar">Nombre o correo</label><input id="buscar"></div>
+          <div><label for="rol">Rol</label><select id="rol"><option value="">Todos</option><option>HUESPED</option><option>ANFITRION</option><option>ADMINISTRADOR</option></select></div>
+          <div><label for="estado">Estado</label><select id="estado"><option value="">Todos</option><option>ACTIVO</option><option>RESTRINGIDO</option><option>DESACTIVADO</option></select></div>
+        </div>
+        <div class="acciones"><button type="submit">Consultar</button></div>
+      </form>
+      <div class="card envoltura-tabla"><table class="tabla-admin" id="tabla"></table></div>
+    </div>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/admin/admin.js"></script>
+  <script src="../../js/admin/usuarios.js"></script>
+</body>
+</html>

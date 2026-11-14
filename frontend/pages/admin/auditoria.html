@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auditoría · Administración · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="auditoria"></header>
+  <main style="max-width:1140px">
+    <h1>Auditoría</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <div data-contenido>
+      <form class="card" id="filtros" novalidate>
+        <div class="fila">
+          <div><label for="entidad">Entidad</label><select id="entidad"><option value="">Todas</option><option value="usuario">Usuario</option><option value="alojamiento">Alojamiento</option><option value="reserva">Reserva</option><option value="pago">Pago</option><option value="resena">Reseña</option><option value="reporte">Reporte</option></select></div>
+          <div><label for="accion">Acción contiene</label><input id="accion" placeholder="p. ej. RESERVA"></div>
+          <div><label for="desde">Desde</label><input type="date" id="desde"></div>
+          <div><label for="hasta">Hasta</label><input type="date" id="hasta"></div>
+        </div>
+        <div class="acciones"><button type="submit">Filtrar</button></div>
+      </form>
+      <p class="suave" id="resumen"></p>
+      <div class="card envoltura-tabla"><table class="tabla-admin" id="tabla"></table></div>
+      <nav class="paginador oculto" id="paginador"><button type="button" class="secundario" id="anterior">Anterior</button><span id="pagina"></span><button type="button" class="secundario" id="siguiente">Siguiente</button></nav>
+    </div>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/admin/admin.js"></script>
+  <script src="../../js/admin/auditoria.js"></script>
+</body>
+</html>

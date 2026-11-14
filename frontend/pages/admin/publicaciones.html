@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moderar publicaciones · Administración · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="publicaciones"></header>
+  <main style="max-width:1140px">
+    <h1>Moderar publicaciones</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <div data-contenido>
+      <form class="card" id="filtros" novalidate>
+        <label for="estado">Estado</label>
+        <select id="estado"><option value="PENDIENTE_REVISION">En revisión</option><option value="">Todas</option><option value="ACTIVA">Activas</option><option value="PAUSADA">Pausadas</option><option value="BLOQUEADA">Bloqueadas</option><option value="BORRADOR">Borradores</option></select>
+        <div class="acciones"><button type="submit">Consultar</button></div>
+      </form>
+      <div class="card envoltura-tabla"><table class="tabla-admin" id="tabla"></table></div>
+      <section class="card"><h2>Reservas en revisión manual</h2><p class="suave">Reservas futuras de publicaciones bloqueadas: se conservan y el administrador registra la decisión tomada.</p>
+        <div class="envoltura-tabla"><table class="tabla-admin" id="revisiones"></table></div></section>
+    </div>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/admin/admin.js"></script>
+  <script src="../../js/admin/publicaciones.js"></script>
+</body>
+</html>

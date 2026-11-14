@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indicadores y reportes · Administración · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="dashboard"></header>
+  <main style="max-width:1140px">
+    <h1>Indicadores y reportes</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <div data-contenido>
+      <section class="kpis" id="kpis" aria-label="Indicadores"></section>
+      <div class="fila">
+        <section class="card"><h2>Reservas por estado</h2><table class="tabla-admin" id="por-estado"></table></section>
+        <section class="card"><h2>Ciudades con mayor demanda</h2><table class="tabla-admin" id="ciudades"></table></section>
+      </div>
+      <p class="suave" id="calculado"></p>
+      <form class="card" id="form-reporte" novalidate>
+        <h2>Exportar reporte</h2>
+        <div class="fila">
+          <div><label for="tipo">Reporte</label>
+            <select id="tipo"><option value="USUARIOS">Usuarios</option><option value="PUBLICACIONES">Publicaciones</option><option value="RESERVAS">Reservas</option><option value="INGRESOS">Ingresos</option><option value="DEMANDA">Demanda por ciudad y tipo</option></select></div>
+          <div><label for="formato">Formato</label>
+            <select id="formato"><option value="PDF">PDF</option><option value="EXCEL">Excel</option></select></div>
+        </div>
+        <div class="acciones"><button type="submit" id="btn-exportar">Descargar</button><button type="button" class="secundario" id="btn-actualizar">Actualizar indicadores</button></div>
+      </form>
+    </div>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/admin/admin.js"></script>
+  <script src="../../js/admin/dashboard.js"></script>
+</body>
+</html>
