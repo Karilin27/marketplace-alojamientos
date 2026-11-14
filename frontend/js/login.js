@@ -22,6 +22,9 @@ function destinoTrasLogin(rol) {
     if (volver && volver.startsWith("/") && !volver.startsWith("//")) {
         return volver;
     }
+    if (rol === "ADMINISTRADOR") {
+        return "admin/dashboard.html";
+    }
     return rol === "ANFITRION" ? "reservas/recibidas.html" : "reservas/mis-reservas.html";
 }
 

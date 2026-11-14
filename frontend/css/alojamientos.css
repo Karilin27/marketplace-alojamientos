@@ -19,3 +19,19 @@
 .estado.BLOQUEADA { color: var(--bad); border-color: var(--bad); }
 .paginador { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 16px; }
 @media (max-width: 480px) { .adicional { grid-template-columns: 1fr; } }
+
+/* S6 — panel de administración */
+.kpis { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 16px; }
+.kpi { background: var(--card); border: 1px solid var(--borde); border-radius: var(--radio); padding: 14px 16px; box-shadow: var(--sombra); }
+.kpi .valor { font-size: 1.6rem; font-weight: 700; display: block; }
+.kpi .etiqueta { color: var(--suave); font-size: .9rem; }
+.tabla-admin { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.tabla-admin th, .tabla-admin td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--borde); vertical-align: top; }
+.tabla-admin th { font-size: .85rem; color: var(--suave); }
+.envoltura-tabla { overflow-x: auto; }
+.acciones-fila { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.acciones-fila input { max-width: 200px; padding: 6px 8px; }
+.acciones-fila button { padding: 6px 10px; }
+.estado.ACTIVO { color: var(--ok); border-color: var(--ok); }
+.estado.RESTRINGIDO { color: var(--bad); border-color: var(--bad); }
+.estado.DESACTIVADO { color: var(--warn); border-color: var(--warn); }

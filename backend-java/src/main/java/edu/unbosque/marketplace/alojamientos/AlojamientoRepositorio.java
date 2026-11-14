@@ -239,7 +239,9 @@ public class AlojamientoRepositorio {
         StringBuilder where = new StringBuilder(" WHERE a.estado_publicacion = 'ACTIVA'");
         List<Object> p = new ArrayList<>();
         if (f.ciudad() != null) {
-            where.append(" AND lower(a.ciudad) = lower(?)");
+            // Búsqueda de ciudad sin distinguir mayúsculas ni tildes ("bogota" encuentra "Bogotá").
+            where.append(" AND translate(lower(trim(a.ciudad)), 'áéíóúüñ', 'aeiouun')"
+                    + " = translate(lower(trim(?)), 'áéíóúüñ', 'aeiouun')");
             p.add(f.ciudad());
         }
         if (f.tipo() != null) {
