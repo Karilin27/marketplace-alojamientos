@@ -36,6 +36,7 @@
       $('calificacion').textContent = a.totalResenas > 0                             // CA-02
         ? '★ ' + a.calificacionPromedio + ' de 5 · ' + a.totalResenas + (a.totalResenas === 1 ? ' reseña' : ' reseñas')
         : 'Este alojamiento aún no tiene reseñas.';
+      cargarResenas(a.id);
 
       var q = 'alojamiento=' + encodeURIComponent(a.id);                             // CA-04 → CU-10
       $('cotizar').href = '../reservas/reservar.html?' + q;
@@ -45,5 +46,19 @@
       window.mostrarMensaje(e.status === 404 ? 'No es posible mostrar esta publicación: no existe o no está activa.' : e.mensaje, 'error');  // CA-03
     }
   }
+  // HU-017 CA-06: reseñas visibles (las ocultas por un administrador no se muestran)
+  async function cargarResenas(idAlojamiento) {
+    try {
+      var r = await A.resenas(idAlojamiento);
+      var lista = $('resenas'); lista.textContent = '';
+      r.resenas.forEach(function (x) {
+        lista.appendChild(el('li', {}, [
+          el('div', {}, [el('strong', { texto: '★'.repeat(x.calificacion) + '☆'.repeat(5 - x.calificacion) }), ' ', el('span', { clase: 'suave', texto: x.autor + ' · ' + new Date(x.fecha).toLocaleDateString('es-CO') })]),
+          el('p', { style: 'margin:4px 0 0', texto: x.comentario }),
+        ]));
+      });
+    } catch (e) { /* el promedio ya se mostró; la lista es complementaria */ }
+  }
+
   cargar();
 })();

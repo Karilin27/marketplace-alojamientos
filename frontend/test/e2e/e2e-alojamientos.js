@@ -1,6 +1,6 @@
 /* Recorrido de punta a punta de las pantallas de S2 contra una API simulada en memoria.
    Requiere playwright:  node frontend/test/e2e/e2e-alojamientos.js
-   Flujo: publicar (HU-005) → tarifas (HU-024) → activar (HU-007) → buscar (HU-009) → detalle (HU-010) → cotizar (enlace a CU-10). */
+   Flujo: publicar (HU-005) → tarifas (HU-024) → activar (HU-007) → buscar (HU-009) → detalle (HU-010) → reseñar (HU-017) → moderar (HU-025). */
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -15,6 +15,8 @@ const POLITICAS = [
   { id: crypto.randomUUID(), nombre: 'ESTRICTA', diasAntelacion: 14, porcentajeDevolucion: 50 },
 ];
 const db = new Map();
+const resenas = [];
+const RESERVA_COMPLETADA = crypto.randomUUID();
 const ANFITRION = crypto.randomUUID();
 
 function json(res, status, cuerpo) {
@@ -28,6 +30,23 @@ async function api(req, res, url) {
   const p = url.pathname, m = req.method;
   if (m === 'OPTIONS') return json(res, 204);
   if (p === '/api/cancellation-policies') return json(res, 200, POLITICAS);
+  const resumen = (idA) => { const v = resenas.filter((r) => r.idAlojamiento === idA && r.visible);
+    return { idAlojamiento: idA, calificacionPromedio: v.length ? Math.round(v.reduce((a, r) => a + r.calificacion, 0) / v.length * 10) / 10 : null, total: v.length, resenas: v }; };
+  if (p === '/api/reviews' && m === 'GET') return json(res, 200, resumen(url.searchParams.get('accommodationId')));
+  if (p === '/api/reviews' && m === 'POST') {
+    const b = await leer(req);
+    if (b.idReserva !== RESERVA_COMPLETADA) return json(res, 422, { codigo: 'RESERVA_NO_COMPLETADA', mensaje: 'Solo puede reseñar una estancia completada.' });
+    if (resenas.some((r) => r.idReserva === b.idReserva)) return json(res, 409, { codigo: 'RESENA_DUPLICADA', mensaje: 'Esta reserva ya tiene una reseña.' });
+    const idA = [...db.keys()][0];
+    resenas.push({ id: crypto.randomUUID(), idReserva: b.idReserva, idAlojamiento: idA, alojamiento: db.get(idA).titulo, autor: 'Ana', calificacion: b.calificacion, comentario: b.comentario, visible: true, motivoOculta: null, fecha: new Date().toISOString() });
+    return json(res, 201, resumen(idA));
+  }
+  if (p === '/api/admin/reviews') return json(res, 200, resenas);
+  let v;
+  if ((v = p.match(/^\/api\/admin\/reviews\/([^/]+)\/visibility$/))) {
+    const b = await leer(req); const r = resenas.find((x) => x.id === v[1]);
+    r.visible = b.visible; r.motivoOculta = b.visible ? null : b.motivo; return json(res, 200, resumen(r.idAlojamiento));
+  }
   if (p === '/api/accommodations' && m === 'POST') {
     const b = await leer(req);
     if (!(b.capacidad > 0) || !(b.precioPorNoche > 0)) return json(res, 400, { codigo: 'ALOJAMIENTO_INVALIDO', mensaje: 'Datos inválidos', detalles: [] });
@@ -85,7 +104,7 @@ function servidor(puerto) {
   const srv = await servidor(puerto);
   const nav = await chromium.launch();
   const ctx = await nav.newContext();
-  await ctx.addInitScript((u) => { localStorage.setItem('token', 'jwt-de-prueba'); localStorage.setItem('usuario', JSON.stringify({ id: u, rol: 'ANFITRION', nombre: 'Anfitrión' })); }, ANFITRION);
+  await ctx.addInitScript((u) => { localStorage.setItem('token', 'jwt-de-prueba'); if (!localStorage.getItem('usuario')) localStorage.setItem('usuario', JSON.stringify({ id: u, rol: 'ANFITRION', nombre: 'Anfitrión' })); }, ANFITRION);
   await ctx.route('**/js/config.js', (r) => r.fulfill({ contentType: 'text/javascript', body: `window.APP_CONFIG={API_BASE:'${base}'};` }));
   const page = await ctx.newPage();
   const errores = []; page.on('pageerror', (e) => errores.push(e.message));
@@ -139,6 +158,36 @@ function servidor(puerto) {
   assert.match(await page.getAttribute('#cotizar', 'href'), /reservas\/reservar\.html\?alojamiento=/); paso('HU-010 CP-09-04: enlace a cotizar (CU-10)');
   await page.goto(base + '/pages/alojamientos/detalle.html?id=no-existe');
   await page.waitForFunction(() => /No es posible mostrar/.test(document.getElementById('mensaje').textContent)); paso('HU-010 CP-09-03: publicación inexistente');
+
+  // HU-017: reseñar una estancia completada
+  const idA01 = [...db.keys()][0];
+  resenas.push({ id: crypto.randomUUID(), idReserva: crypto.randomUUID(), idAlojamiento: idA01, alojamiento: 'Apartamento Chapinero', autor: 'Luis', calificacion: 3, comentario: 'Regular', visible: true, motivoOculta: null, fecha: new Date().toISOString() });
+  await page.goto(base + '/pages/resenas/resenar.html?reserva=' + RESERVA_COMPLETADA);
+  await page.fill('#comentario', ' '); await page.click('#btn-enviar');
+  assert.match(await page.textContent('#e-calificacion'), /1 a 5/); assert.match(await page.textContent('#e-comentario'), /comentario/); paso('HU-017 CP-16-05: datos inválidos');
+  await page.check('input[name=calificacion][value="5"]'); await page.fill('#comentario', 'Excelente ubicación'); await page.click('#btn-enviar');
+  await page.waitForSelector('#hecho:not(.oculto)');
+  assert.match(await page.textContent('#nuevo-promedio'), /4 de 5 \(2 reseñas\)/); paso('HU-017 CP-16-01: reseña registrada y promedio 4,0');
+  await page.goto(base + '/pages/resenas/resenar.html?reserva=' + RESERVA_COMPLETADA);
+  await page.check('input[name=calificacion][value="4"]'); await page.fill('#comentario', 'Otra vez'); await page.click('#btn-enviar');
+  await page.waitForFunction(() => /ya tiene una reseña/.test(document.getElementById('mensaje').textContent)); paso('HU-017 CP-16-04: segunda reseña rechazada');
+  await page.goto(base + '/pages/alojamientos/detalle.html?id=' + idA01);
+  await page.waitForFunction(() => document.querySelectorAll('#resenas li').length === 2); paso('HU-017 CP-16-02: el detalle muestra las reseñas visibles');
+
+  // HU-025: el administrador oculta y restablece
+  await page.evaluate(() => localStorage.setItem('usuario', JSON.stringify({ rol: 'ADMINISTRADOR', nombre: 'Admin' })));
+  await page.goto(base + '/pages/resenas/moderar.html');
+  await page.waitForSelector('#lista li button.peligro');
+  const fila = page.locator('#lista li', { hasText: 'Regular' });
+  await fila.locator('button.peligro').click();
+  assert.match(await fila.locator('.error-campo').textContent(), /motivo/); paso('HU-025 CP-22-03: ocultar sin motivo rechazado');
+  await fila.locator('input').fill('Lenguaje ofensivo'); await fila.locator('button.peligro').click();
+  await page.waitForFunction(() => /Nuevo promedio.*★ 5/.test(document.getElementById('mensaje').textContent)); paso('HU-025 CP-22-01: reseña oculta y promedio 5,0');
+  await page.locator('#lista li', { hasText: 'Regular' }).locator('button.secundario').click();
+  await page.waitForFunction(() => /restablecida.*★ 4/.test(document.getElementById('mensaje').textContent)); paso('HU-025 CP-22-02: reseña restablecida y promedio 4,0');
+  await page.evaluate(() => localStorage.setItem('usuario', JSON.stringify({ rol: 'HUESPED', nombre: 'Ana' })));
+  await page.goto(base + '/pages/resenas/moderar.html');
+  await page.waitForFunction(() => /Solo un administrador/.test(document.getElementById('mensaje').textContent)); paso('HU-025 CP-22-04: un no administrador no puede moderar');
 
   assert.deepEqual(errores, []); paso('sin errores de JavaScript');
   await nav.close(); srv.close();

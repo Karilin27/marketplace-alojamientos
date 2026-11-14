@@ -1,0 +1,507 @@
+{
+  "info": {
+    "name": "S5 Reseñas – Marketplace Inversiones LR",
+    "description": "HU-017 y HU-025. Validaciones y permisos. Los casos con una reserva COMPLETADA (CP-16-01, CP-16-04, CP-22-01 y CP-22-02) requieren los datos de database/dev/seed_resenas.sql y un token de administrador. Ejecutar: newman run api/S5-resenas.postman_collection.json --env-var baseUrl=http://localhost:8080",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "0.1 Registrar anfitrión de prueba",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"correoAnfitrion\", \"anf\" + Date.now() + \"@test.com\");",
+              "pm.collectionVariables.set(\"correoOtro\", \"otro\" + Date.now() + \"@test.com\");",
+              "pm.collectionVariables.set(\"correoHuesped\", \"hue\" + Date.now() + \"@test.com\");"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Anfitrión Postman\",\n  \"correo\": \"{{correoAnfitrion}}\",\n  \"contrasena\": \"Clave2026*\",\n  \"rol\": \"ANFITRION\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.2 Iniciar sesión anfitrión",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"tokenAnfitrion\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correoAnfitrion}}\",\n  \"contrasena\": \"Clave2026*\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.5 Registrar huésped",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Huésped Postman\",\n  \"correo\": \"{{correoHuesped}}\",\n  \"contrasena\": \"Clave2026*\",\n  \"rol\": \"HUESPED\"\n}"
+        }
+      }
+    },
+    {
+      "name": "0.6 Iniciar sesión huésped",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set(\"tokenHuesped\", pm.response.json().token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"correo\": \"{{correoHuesped}}\",\n  \"contrasena\": \"Clave2026*\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-023 CA-01 · Listar políticas (CP-05-04)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const p = pm.response.json();",
+              "pm.test(\"Tres políticas\", () => pm.expect(p.map(x => x.nombre)).to.have.members([\"FLEXIBLE\",\"MODERADA\",\"ESTRICTA\"]));",
+              "pm.collectionVariables.set(\"idModerada\", p.find(x => x.nombre === \"MODERADA\").id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/cancellation-policies",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "cancellation-policies"
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-005 CP-05-01 · Crear A-01 en BORRADOR",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const a = pm.response.json();",
+              "pm.test(\"BORRADOR y asociada al anfitrión\", () => { pm.expect(a.estado).to.eql(\"BORRADOR\"); pm.expect(a.politicaCancelacion.nombre).to.eql(\"MODERADA\"); });",
+              "pm.collectionVariables.set(\"idA01\", a.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/accommodations",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "accommodations"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Apartamento Chapinero\",\n  \"descripcion\": \"Cerca a la zona G\",\n  \"tipo\": \"APARTAMENTO\",\n  \"ciudad\": \"Bogotá\",\n  \"direccion\": \"Calle 60 # 5-20\",\n  \"capacidad\": 4,\n  \"precioPorNoche\": 200000,\n  \"servicios\": [\n    \"WiFi\",\n    \"Cocina\"\n  ],\n  \"reglas\": \"No fumar\",\n  \"imagenes\": [\n    \"https://img.ejemplo.com/1.jpg\",\n    \"https://img.ejemplo.com/2.jpg\",\n    \"https://img.ejemplo.com/3.jpg\"\n  ],\n  \"idPoliticaCancelacion\": \"{{idModerada}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-017 CA-06 · Reseñas visibles de A-01 (público)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const r = pm.response.json();",
+              "pm.test(\"Estructura\", () => { pm.expect(r).to.include.keys(\"calificacionPromedio\",\"total\",\"resenas\"); pm.expect(r.resenas).to.be.an(\"array\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/reviews?accommodationId={{idA01}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reviews"
+          ],
+          "query": [
+            {
+              "key": "accommodationId",
+              "value": "{{idA01}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "HU-017 · Un anfitrión no puede reseñar",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/reviews",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reviews"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idReserva\": \"00000000-0000-0000-0000-000000000000\",\n  \"calificacion\": 5,\n  \"comentario\": \"x\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-017 CP-16-05 · Calificación fuera de rango y comentario vacío",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Indica ambos campos\", () => { const d = pm.response.json().detalles.join(\" \"); pm.expect(d).to.include(\"calificacion\"); pm.expect(d).to.include(\"comentario\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenHuesped}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/reviews",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reviews"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idReserva\": \"00000000-0000-0000-0000-000000000000\",\n  \"calificacion\": 6,\n  \"comentario\": \" \"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-017 CP-16-03 · Reserva inexistente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenHuesped}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/reviews",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "reviews"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idReserva\": \"00000000-0000-0000-0000-000000000000\",\n  \"calificacion\": 5,\n  \"comentario\": \"Excelente\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-025 CP-22-04 · Un no administrador no puede moderar",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAnfitrion}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/reviews/00000000-0000-0000-0000-000000000000/visibility",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "reviews",
+            "00000000-0000-0000-0000-000000000000",
+            "visibility"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"visible\": false,\n  \"motivo\": \"x\"\n}"
+        }
+      }
+    },
+    {
+      "name": "HU-025 CP-22-04 · Un no administrador no lista reseñas ocultas",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenHuesped}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/reviews",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "reviews"
+          ]
+        }
+      }
+    }
+  ]
+}
