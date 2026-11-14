@@ -1,7 +1,7 @@
 // Configuración común de las pantallas de cuenta (registro e inicio de sesión).
 // API_BASE debe apuntar al mismo backend que usa frontend/js/reservas/config.js.
 window.APP_CONFIG = {
-    API_BASE: "http://localhost:8080"
+    API_BASE: "https://marketplace-alojamientos-api.onrender.com"
 };
 
 // Envía un JSON por POST y devuelve { ok, status, datos }.
