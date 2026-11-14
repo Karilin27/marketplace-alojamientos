@@ -13,6 +13,9 @@
       b.addEventListener('click', function () { abrirCancelar(r); });
       acciones.appendChild(b);
     }
+    if (r.estado === 'COMPLETADA') {                         // S5 HU-017: reseñar la estancia completada
+      acciones.appendChild(el('a', { clase: 'boton', href: '../resenas/resenar.html?reserva=' + encodeURIComponent(r.id), texto: 'Reseñar estancia' }));
+    }
     var li = el('li', {}, [
       el('div', {}, [el('strong', { texto: r.fechaLlegada + ' → ' + r.fechaSalida }), ' ', el('span', { clase: 'etiqueta ' + e.clase, texto: e.texto })]),
       el('div', { clase: 'suave', texto: r.huespedes + ' huésped(es) · Total ' + L.formatearCOP(r.desglose.total) }),

@@ -59,6 +59,11 @@
     mia: function (id) { return llamar('GET', '/api/accommodations/mine/' + encodeURIComponent(id)); },
     cambiarEstado: function (id, estado) { return llamar('PATCH', '/api/accommodations/' + encodeURIComponent(id) + '/status', { estado: estado }); },
     tarifas: function (id, cuerpo) { return llamar('PUT', '/api/accommodations/' + encodeURIComponent(id) + '/pricing', cuerpo); },
+    // HU-017 y HU-025 (S5 reseñas)
+    resenas: function (idAlojamiento) { return llamar('GET', '/api/reviews?accommodationId=' + encodeURIComponent(idAlojamiento), undefined, false); },
+    resenar: function (cuerpo) { return llamar('POST', '/api/reviews', cuerpo); },
+    resenasAdmin: function (idAlojamiento) { return llamar('GET', '/api/admin/reviews' + (idAlojamiento ? '?accommodationId=' + encodeURIComponent(idAlojamiento) : '')); },
+    visibilidad: function (id, visible, motivo) { return llamar('PATCH', '/api/admin/reviews/' + encodeURIComponent(id) + '/visibility', { visible: visible, motivo: motivo || null }); },
   };
 
   // ---------------------------------------------------------------- utilidades de pantalla
@@ -87,14 +92,17 @@
   document.addEventListener('DOMContentLoaded', function () {
     var barra = document.getElementById('barra'); if (!barra) return;
     var actual = barra.getAttribute('data-actual');
+    var enOtraCarpeta = barra.hasAttribute('data-raiz');            // páginas fuera de pages/alojamientos/
     var u = usuario();
     var enlaces = [['buscar', 'Buscar alojamientos']];
     if (u && u.rol === 'ANFITRION') enlaces.push(['mis-publicaciones', 'Mis publicaciones'], ['publicar', 'Publicar']);
+    if (u && u.rol === 'ADMINISTRADOR') enlaces.push(['../resenas/moderar', 'Moderar reseñas']);
     if (token()) enlaces.push(['../reservas/mis-reservas', 'Mis reservas']);
     else enlaces.push(['../login', 'Iniciar sesión']);
     barra.appendChild(window.el('span', { clase: 'marca', texto: 'Marketplace · Alojamientos' }));
     enlaces.forEach(function (e) {
-      var a = window.el('a', { href: e[0] + '.html', texto: e[1] });
+      var ruta = enOtraCarpeta && e[0].indexOf('../') !== 0 ? '../alojamientos/' + e[0] : e[0];
+      var a = window.el('a', { href: ruta + '.html', texto: e[1] });
       if (e[0] === actual) a.setAttribute('aria-current', 'page');
       barra.appendChild(a);
     });

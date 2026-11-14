@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reseñar estancia · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="resenar" data-raiz></header>
+  <main>
+    <p><a href="../reservas/mis-reservas.html">← Volver a mis reservas</a></p>
+    <h1>Reseñar tu estancia</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <form id="form" class="card" novalidate>
+      <fieldset style="border:0;padding:0;margin:0">
+        <legend style="font-weight:600">Calificación</legend>
+        <div class="casillas" id="estrellas" role="radiogroup"></div>
+        <p class="error-campo" id="e-calificacion"></p>
+      </fieldset>
+      <label for="comentario">Comentario</label>
+      <textarea id="comentario" rows="5" maxlength="1000" placeholder="¿Qué te gustó? ¿Qué podría mejorar?"></textarea>
+      <p class="suave"><span id="contador">0</span> / 1000</p>
+      <p class="error-campo" id="e-comentario"></p>
+      <div class="acciones"><button type="submit" id="btn-enviar">Publicar reseña</button></div>
+    </form>
+    <section id="hecho" class="card oculto">
+      <h2>¡Gracias por tu reseña!</h2>
+      <p id="nuevo-promedio"></p>
+      <p><a id="ver-alojamiento">Ver el alojamiento</a></p>
+    </section>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/alojamientos/api.js"></script>
+  <script src="../../js/resenas/logica.js"></script>
+  <script src="../../js/resenas/resenar.js"></script>
+</body>
+</html>

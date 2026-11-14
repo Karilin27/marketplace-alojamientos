@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Moderar reseñas · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="../resenas/moderar" data-raiz></header>
+  <main>
+    <h1>Moderar reseñas</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <form id="filtro" class="card" novalidate>
+      <label for="alojamiento">Identificador del alojamiento (opcional)</label>
+      <input id="alojamiento" placeholder="Deja vacío para ver las más recientes de todos">
+      <div class="acciones"><button type="submit">Consultar</button></div>
+    </form>
+    <ul class="lista" id="lista" aria-label="Reseñas"></ul>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/alojamientos/api.js"></script>
+  <script src="../../js/resenas/logica.js"></script>
+  <script src="../../js/resenas/moderar.js"></script>
+</body>
+</html>
