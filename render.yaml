@@ -1,0 +1,26 @@
+# Blueprint de Render para el backend. Los secretos (sync: false) se cargan a mano en el panel de Render.
+services:
+  - type: web
+    name: marketplace-alojamientos-api
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./backend-java/Dockerfile
+    dockerContext: ./backend-java
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: COTIZACION_SECRET
+        generateValue: true
+      - key: PASARELA
+        value: simulada
+      - key: CORS_ORIGENES
+        sync: false
