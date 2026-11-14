@@ -111,6 +111,22 @@ public final class ReglasAlojamiento {
     }
 
     /**
+     * HU-006 CA-02: una publicación ACTIVA no puede quedar sin un campo obligatorio. Además de lo que se exige
+     * para guardar (ver {@link #errores}), una ACTIVA debe conservar al menos una imagen y su política de
+     * cancelación (RN-16, HU-023 CA-03). Devuelve los mensajes de qué corregir; lista vacía = se puede guardar.
+     */
+    public static List<String> erroresEdicionActiva(Datos d) {
+        List<String> e = new ArrayList<>();
+        if (d.imagenes().isEmpty()) {
+            e.add("imagenes: una publicación ACTIVA necesita al menos una imagen");
+        }
+        if (d.idPolitica() == null) {
+            e.add("idPoliticaCancelacion: una publicación ACTIVA necesita una política de cancelación");
+        }
+        return e;
+    }
+
+    /**
      * HU-006 CA-06: cambiar título, descripción, ubicación o tipo de una publicación ACTIVA
      * la devuelve a PENDIENTE_REVISION para que el administrador la apruebe de nuevo.
      */

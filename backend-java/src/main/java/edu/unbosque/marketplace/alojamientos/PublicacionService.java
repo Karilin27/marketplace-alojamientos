@@ -63,6 +63,13 @@ public class PublicacionService {
         String[] resultado = tx.execute(t -> {
             Registro r = consultas.existente(id, true);
             consultas.exigirDuenoOAdmin(sesion, r);                                  // CA-03, CA-05
+            if (ReglasAlojamiento.ACTIVA.equals(r.estado())) {                       // CA-02: una ACTIVA no pierde
+                List<String> faltan = ReglasAlojamiento.erroresEdicionActiva(d);     // imágenes ni política
+                if (!faltan.isEmpty()) {
+                    throw ReglaNegocioException.solicitudInvalida("ALOJAMIENTO_INVALIDO",
+                            "Hay datos de la publicación que debe corregir.", faltan.toArray(String[]::new));
+                }
+            }
             Datos antes = consultas.datos(r);
             repo.actualizar(id, d);                                                  // CA-07: las reservas guardan
             repo.reemplazarServicios(id, d.servicios());                            // su propio total y política

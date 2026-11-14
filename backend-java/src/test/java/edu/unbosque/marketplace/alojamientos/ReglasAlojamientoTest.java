@@ -101,6 +101,24 @@ class ReglasAlojamientoTest {
         assertEquals(Transicion.NO_PERMITIDA, ReglasAlojamiento.transicionAnfitrion("BORRADOR", "PAUSADA"));
     }
 
+    // ------------------------------------------------------------------ HU-006 CA-02 (publicación ACTIVA)
+
+    @Test
+    void ca02_activaNoPuedeQuedarSinImagenesNiPolitica() {
+        AlojamientoSolicitud s = a01();
+        Datos sinNada = datos(new AlojamientoSolicitud(s.titulo(), s.descripcion(), s.tipo(), s.ciudad(),
+                s.direccion(), s.capacidad(), s.precioPorNoche(), s.servicios(), s.reglas(), List.of(), null));
+        List<String> e = ReglasAlojamiento.erroresEdicionActiva(sinNada);
+        assertEquals(2, e.size());
+        assertTrue(e.get(0).startsWith("imagenes:"));
+        assertTrue(e.get(1).startsWith("idPoliticaCancelacion:"));
+    }
+
+    @Test
+    void ca02_activaCompletaSePuedeGuardar() {
+        assertTrue(ReglasAlojamiento.erroresEdicionActiva(datos(a01())).isEmpty());
+    }
+
     // ------------------------------------------------------------------ HU-006 CA-06
 
     @Test
