@@ -65,14 +65,14 @@
   document.addEventListener('DOMContentLoaded', function () {
     var barra = document.getElementById('barra'); if (!barra) return;
     var actual = barra.getAttribute('data-actual');
-    barra.appendChild(window.el('span', { clase: 'marca', texto: 'Marketplace · Administración' }));
+    barra.appendChild(window.el('a', { clase: 'marca', href: '../../index.html', texto: 'Marketplace · Administración' }));
     [['dashboard', 'Indicadores y reportes'], ['usuarios', 'Usuarios'], ['publicaciones', 'Publicaciones'],
       ['auditoria', 'Auditoría'], ['../resenas/moderar', 'Reseñas']].forEach(function (e) {
       var a = window.el('a', { href: e[0] + '.html', texto: e[1] });
       if (e[0] === actual) a.setAttribute('aria-current', 'page');
       barra.appendChild(a);
     });
-    var salir = window.el('a', { href: '../login.html', texto: 'Salir' });
+    var salir = window.el('a', { href: '../../index.html', texto: 'Salir' });
     salir.addEventListener('click', function () { try { localStorage.removeItem('token'); localStorage.removeItem('usuario'); } catch (e) { /* nada */ } });
     barra.appendChild(salir);
   });

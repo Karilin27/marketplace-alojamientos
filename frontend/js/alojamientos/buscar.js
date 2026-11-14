@@ -10,6 +10,8 @@
   });
   var hoy = new Date().toISOString().slice(0, 10);
   $('llegada').min = hoy; $('salida').min = hoy;
+  var ciudadInicial = new URLSearchParams(window.location.search).get('ciudad');   // viene del buscador de la portada
+  if (ciudadInicial) $('ciudad').value = ciudadInicial;
 
   function filtros() {
     var marcados = [].slice.call(document.querySelectorAll('#servicios input:checked')).map(function (c) { return c.value; });
