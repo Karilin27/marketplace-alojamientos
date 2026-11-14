@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marketplace de Alojamientos · Inversiones LR</title>
+  <meta name="description" content="Encuentra, reserva y publica alojamientos en Colombia. Marketplace de Alojamientos de Inversiones LR.">
+  <link rel="stylesheet" href="css/reservas.css">
+  <link rel="stylesheet" href="css/alojamientos.css">
+  <link rel="stylesheet" href="css/inicio.css">
+</head>
+<body>
+  <header class="barra" id="barra">
+    <a class="marca" href="index.html">Marketplace · Inversiones LR</a>
+    <a href="pages/alojamientos/buscar.html">Buscar alojamientos</a>
+    <span id="nav-sesion" class="nav-sesion">
+      <a href="pages/login.html">Iniciar sesión</a>
+      <a class="boton-nav" href="pages/register.html">Registrarse</a>
+    </span>
+  </header>
+
+  <section class="portada">
+    <div class="portada-texto">
+      <p class="saludo" id="saludo">Bienvenido</p>
+      <h1>Encuentra tu próximo alojamiento o publica el tuyo</h1>
+      <p class="bajada">Busca por ciudad, fechas y número de huéspedes, cotiza al instante y reserva con pago seguro.
+        Si tienes un inmueble, publícalo y recibe reservas.</p>
+      <form class="busqueda-rapida" id="busqueda-rapida" action="pages/alojamientos/buscar.html">
+        <label class="oculto-visual" for="q-ciudad">Ciudad</label>
+        <input id="q-ciudad" name="ciudad" placeholder="¿A qué ciudad vas? Ej.: Bogotá" autocomplete="address-level2">
+        <button type="submit">Buscar</button>
+      </form>
+      <div class="acciones-portada" id="acciones-portada">
+        <a class="boton" href="pages/register.html">Crear una cuenta</a>
+        <a class="boton secundario" href="pages/login.html">Ya tengo cuenta</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="inicio">
+    <section aria-labelledby="t-destacados">
+      <div class="encabezado-seccion">
+        <h2 id="t-destacados">Alojamientos disponibles</h2>
+        <a href="pages/alojamientos/buscar.html">Ver todos →</a>
+      </div>
+      <p class="suave" id="estado-destacados">Cargando alojamientos… (la primera carga puede tardar hasta un minuto mientras se activa el servidor)</p>
+      <div class="resultados" id="destacados"></div>
+    </section>
+
+    <section aria-labelledby="t-roles" class="roles">
+      <h2 id="t-roles">¿Qué puedes hacer?</h2>
+      <div class="tarjetas-rol">
+        <article class="card rol">
+          <h3>Huésped</h3>
+          <ul>
+            <li>Buscar y filtrar alojamientos</li>
+            <li>Consultar disponibilidad y cotizar</li>
+            <li>Reservar y pagar en línea</li>
+            <li>Cancelar según la política</li>
+            <li>Calificar tu estadía</li>
+          </ul>
+        </article>
+        <article class="card rol">
+          <h3>Anfitrión</h3>
+          <ul>
+            <li>Publicar alojamientos con fotos</li>
+            <li>Definir tarifas, descuentos y servicios</li>
+            <li>Bloquear fechas de disponibilidad</li>
+            <li>Gestionar las reservas recibidas</li>
+          </ul>
+        </article>
+        <article class="card rol">
+          <h3>Administrador</h3>
+          <ul>
+            <li>Moderar publicaciones y reseñas</li>
+            <li>Administrar cuentas de usuario</li>
+            <li>Consultar la auditoría</li>
+            <li>Ver indicadores y exportar reportes</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <p>Marketplace de Alojamientos · Inversiones LR — Proyecto de Ingeniería de Software 1, Universidad El Bosque, 2026.</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/inicio.js"></script>
+</body>
+</html>

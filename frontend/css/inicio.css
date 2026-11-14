@@ -1,0 +1,42 @@
+/* Página de inicio — usa las variables y componentes de reservas.css */
+header.barra .nav-sesion { display: flex; gap: 16px; align-items: center; }
+header.barra a.boton-nav { background: var(--primario); color: #fff; border-radius: 8px; padding: 6px 14px; border-bottom: 0; }
+header.barra a.boton-nav:hover { background: var(--primario-h); }
+
+.portada {
+  background: linear-gradient(135deg, var(--primario) 0%, #0e4f6e 100%);
+  color: #fff; padding: 56px 0 64px;
+}
+.portada-texto { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+.portada .saludo { margin: 0 0 6px; font-weight: 600; opacity: .9; text-transform: uppercase; letter-spacing: .06em; font-size: .9rem; }
+.portada h1 { font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.15; margin: 0 0 12px; max-width: 760px; }
+.portada .bajada { max-width: 640px; margin: 0 0 24px; opacity: .95; font-size: 1.05rem; }
+
+.busqueda-rapida { display: flex; gap: 8px; max-width: 560px; background: #fff; padding: 6px; border-radius: 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, .18); }
+.busqueda-rapida input { flex: 1; border: 0; padding: 10px 12px; font: inherit; color: #1c2430; background: transparent; outline: none; min-width: 0; }
+.busqueda-rapida button { white-space: nowrap; }
+
+.acciones-portada { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.acciones-portada .boton { background: #fff; color: var(--primario); }
+.acciones-portada .boton:hover { background: #eef6f2; }
+.acciones-portada .boton.secundario { background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, .7); }
+.acciones-portada .boton.secundario:hover { background: rgba(255, 255, 255, .12); }
+
+main.inicio { max-width: 1080px; }
+.encabezado-seccion { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.encabezado-seccion a { color: var(--primario); text-decoration: none; font-weight: 600; }
+.suave { color: var(--suave); }
+
+.roles { margin-top: 40px; }
+.tarjetas-rol { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.rol h3 { margin: 0 0 8px; color: var(--primario); }
+.rol ul { margin: 0; padding-left: 18px; }
+.rol li { margin: 4px 0; }
+
+.pie { border-top: 1px solid var(--borde); color: var(--suave); text-align: center; padding: 20px 16px; font-size: .9rem; }
+.oculto-visual { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 560px) {
+  header.barra .nav-sesion { width: 100%; }
+  .busqueda-rapida { flex-direction: column; }
+}

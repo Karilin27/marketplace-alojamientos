@@ -98,13 +98,18 @@
     if (u && u.rol === 'ANFITRION') enlaces.push(['mis-publicaciones', 'Mis publicaciones'], ['publicar', 'Publicar']);
     if (u && u.rol === 'ADMINISTRADOR') enlaces.push(['../resenas/moderar', 'Moderar reseñas']);
     if (token()) enlaces.push(['../reservas/mis-reservas', 'Mis reservas']);
-    else enlaces.push(['../login', 'Iniciar sesión']);
-    barra.appendChild(window.el('span', { clase: 'marca', texto: 'Marketplace · Alojamientos' }));
+    else enlaces.push(['../login', 'Iniciar sesión'], ['../register', 'Registrarse']);
+    barra.appendChild(window.el('a', { clase: 'marca', href: '../../index.html', texto: 'Marketplace · Alojamientos' }));
     enlaces.forEach(function (e) {
       var ruta = enOtraCarpeta && e[0].indexOf('../') !== 0 ? '../alojamientos/' + e[0] : e[0];
       var a = window.el('a', { href: ruta + '.html', texto: e[1] });
       if (e[0] === actual) a.setAttribute('aria-current', 'page');
       barra.appendChild(a);
     });
+    if (token()) {                                                   // cerrar sesión y volver al inicio
+      var salir = window.el('a', { href: '../../index.html', texto: 'Salir' });
+      salir.addEventListener('click', function () { try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem('usuario'); } catch (e) { /* nada */ } });
+      barra.appendChild(salir);
+    }
   });
 })();

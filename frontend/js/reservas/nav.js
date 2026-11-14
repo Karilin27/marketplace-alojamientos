@@ -12,7 +12,7 @@
     var u = JSON.parse(localStorage.getItem('usuario') || 'null');
     if (u && u.rol === 'ANFITRION') enlaces.splice(1, 0, ['../alojamientos/mis-publicaciones', 'Mis publicaciones']);
   } catch (e) { /* sin almacenamiento */ }
-  var marca = document.createElement('span'); marca.className = 'marca'; marca.textContent = 'Marketplace · Reservas';
+  var marca = document.createElement('a'); marca.className = 'marca'; marca.href = '../../index.html'; marca.textContent = 'Marketplace · Reservas';
   barra.appendChild(marca);
   enlaces.forEach(function (e) {
     var a = document.createElement('a'); a.href = e[0] + '.html'; a.textContent = e[1];
@@ -20,6 +20,9 @@
     if (e[0] === 'notificaciones') { var s = document.createElement('span'); s.id = 'insignia'; s.className = 'insignia oculto'; a.appendChild(s); }
     barra.appendChild(a);
   });
+  var salir = document.createElement('a'); salir.href = '../../index.html'; salir.textContent = 'Salir';
+  salir.addEventListener('click', function () { try { localStorage.removeItem('token'); localStorage.removeItem('usuario'); } catch (e) { /* nada */ } });
+  barra.appendChild(salir);
   if (actual !== 'notificaciones') {
     A.notificaciones(true, 0).then(function (p) {
       var s = document.getElementById('insignia');
