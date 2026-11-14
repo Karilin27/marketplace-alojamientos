@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buscar alojamientos · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="buscar"></header>
+  <main style="max-width:1080px">
+    <h1>Buscar alojamientos</h1>
+    <form id="filtros" class="card" novalidate>
+      <div class="fila">
+        <div><label for="ciudad">Ciudad</label><input id="ciudad" placeholder="Bogotá" autocomplete="address-level2"></div>
+        <div><label for="llegada">Llegada</label><input type="date" id="llegada"></div>
+        <div><label for="salida">Salida</label><input type="date" id="salida"></div>
+        <div><label for="huespedes">Huéspedes</label><input type="number" id="huespedes" min="1" placeholder="2"></div>
+      </div>
+      <div class="fila">
+        <div><label for="tipo">Tipo</label>
+          <select id="tipo"><option value="">Cualquiera</option><option value="APARTAMENTO">Apartamento</option><option value="CASA">Casa</option><option value="HABITACION">Habitación</option><option value="CABANA">Cabaña</option><option value="OTRO">Otro</option></select></div>
+        <div><label for="precioMin">Precio mínimo por noche</label><input type="number" id="precioMin" min="0" step="1000"></div>
+        <div><label for="precioMax">Precio máximo por noche</label><input type="number" id="precioMax" min="0" step="1000"></div>
+      </div>
+      <fieldset style="border:0;padding:0;margin:12px 0 0"><legend style="font-weight:600">Servicios</legend>
+        <div class="casillas" id="servicios"></div></fieldset>
+      <p class="error-campo" id="e-filtros"></p>
+      <div class="acciones"><button type="submit" id="btn-buscar">Buscar</button></div>
+    </form>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+    <p class="suave" id="resumen"></p>
+    <section class="resultados" id="resultados" aria-label="Resultados"></section>
+    <nav class="paginador oculto" id="paginador" aria-label="Páginas">
+      <button type="button" class="secundario" id="anterior">Anterior</button><span id="pagina"></span><button type="button" class="secundario" id="siguiente">Siguiente</button>
+    </nav>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/alojamientos/api.js"></script>
+  <script src="../../js/alojamientos/logica.js"></script>
+  <script src="../../js/alojamientos/buscar.js"></script>
+</body>
+</html>

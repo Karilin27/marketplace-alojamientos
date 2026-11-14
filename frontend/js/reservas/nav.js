@@ -5,8 +5,13 @@
   var barra = document.getElementById('barra');
   var actual = barra.getAttribute('data-actual');
   var enlaces = [
+    ['../alojamientos/buscar', 'Buscar alojamientos'],
     ['mis-reservas', 'Mis reservas'], ['recibidas', 'Reservas recibidas'], ['notificaciones', 'Notificaciones'],
   ];
+  try {                                                         // S2: acceso del anfitrión a sus publicaciones
+    var u = JSON.parse(localStorage.getItem('usuario') || 'null');
+    if (u && u.rol === 'ANFITRION') enlaces.splice(1, 0, ['../alojamientos/mis-publicaciones', 'Mis publicaciones']);
+  } catch (e) { /* sin almacenamiento */ }
   var marca = document.createElement('span'); marca.className = 'marca'; marca.textContent = 'Marketplace · Reservas';
   barra.appendChild(marca);
   enlaces.forEach(function (e) {

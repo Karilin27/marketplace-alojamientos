@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Publicar alojamiento · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+  <link rel="stylesheet" href="../../css/alojamientos.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="publicar"></header>
+  <main>
+    <h1 id="encabezado">Publicar alojamiento</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+
+    <form id="form" class="card" novalidate>
+      <h2>1. Datos de la publicación</h2>
+      <label for="titulo">Título</label><input id="titulo" maxlength="120" required><p class="error-campo" id="e-titulo"></p>
+      <label for="descripcion">Descripción</label><textarea id="descripcion" rows="4" required></textarea><p class="error-campo" id="e-descripcion"></p>
+      <div class="fila">
+        <div><label for="tipo">Tipo</label>
+          <select id="tipo" required><option value="">Selecciona</option><option value="APARTAMENTO">Apartamento</option><option value="CASA">Casa</option><option value="HABITACION">Habitación</option><option value="CABANA">Cabaña</option><option value="OTRO">Otro</option></select>
+          <p class="error-campo" id="e-tipo"></p></div>
+        <div><label for="ciudad">Ciudad</label><input id="ciudad" required><p class="error-campo" id="e-ciudad"></p></div>
+      </div>
+      <label for="direccion">Dirección</label><input id="direccion" required><p class="error-campo" id="e-direccion"></p>
+      <div class="fila">
+        <div><label for="capacidad">Capacidad (huéspedes)</label><input type="number" id="capacidad" min="1" step="1" required><p class="error-campo" id="e-capacidad"></p></div>
+        <div><label for="precioPorNoche">Precio por noche (COP)</label><input type="number" id="precioPorNoche" min="1" step="1000" required><p class="error-campo" id="e-precioPorNoche"></p></div>
+      </div>
+      <fieldset style="border:0;padding:0;margin:12px 0 0"><legend style="font-weight:600">Servicios</legend><div class="casillas" id="servicios"></div></fieldset>
+      <label for="reglas">Reglas de la casa</label><textarea id="reglas" rows="2"></textarea>
+      <label for="imagenes">Imágenes (una URL por línea, máximo 10)</label><textarea id="imagenes" rows="3" placeholder="https://..."></textarea><p class="error-campo" id="e-imagenes"></p>
+      <label for="politica">Política de cancelación</label>
+      <select id="politica"><option value="">Elegir más tarde</option></select>
+      <p class="suave" id="politica-ayuda">Necesitas una política para activar la publicación.</p>
+      <div class="acciones"><button type="submit" id="btn-guardar">Guardar borrador</button></div>
+    </form>
+
+    <form id="form-tarifas" class="card oculto" novalidate>
+      <h2>2. Tarifas y servicios adicionales</h2>
+      <div class="fila">
+        <div><label for="tarifaLimpieza">Tarifa de limpieza (COP)</label><input type="number" id="tarifaLimpieza" min="0" step="1000" value="0"><p class="error-campo" id="e-tarifaLimpieza"></p></div>
+        <div><label for="descuentoPct">Descuento por estancia (%)</label><input type="number" id="descuentoPct" min="0" max="100" step="1" value="0"><p class="error-campo" id="e-descuentoPct"></p></div>
+        <div><label for="descuentoMinNoches">Desde cuántas noches</label><input type="number" id="descuentoMinNoches" min="0" step="1" value="0"><p class="error-campo" id="e-descuentoMinNoches"></p></div>
+      </div>
+      <h3 style="font-size:1rem;margin:16px 0 0">Servicios adicionales con costo</h3>
+      <div id="adicionales"></div>
+      <p class="error-campo" id="e-serviciosAdicionales"></p>
+      <div class="acciones">
+        <button type="button" class="secundario" id="btn-agregar">Agregar servicio</button>
+        <button type="submit" id="btn-tarifas">Guardar tarifas</button>
+      </div>
+    </form>
+
+    <section id="siguiente" class="card oculto">
+      <h2>3. Publicar</h2>
+      <p>Cuando tengas fotos y política de cancelación, activa la publicación desde <a href="mis-publicaciones.html">Mis publicaciones</a>. También puedes administrar el <a id="enlace-calendario">calendario de disponibilidad</a>.</p>
+    </section>
+  </main>
+  <script src="../../js/config.js"></script>
+  <script src="../../js/alojamientos/api.js"></script>
+  <script src="../../js/alojamientos/logica.js"></script>
+  <script src="../../js/alojamientos/publicar.js"></script>
+</body>
+</html>
