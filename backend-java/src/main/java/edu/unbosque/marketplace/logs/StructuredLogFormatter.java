@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 public final class StructuredLogFormatter {
 
     private static final Pattern CLAVE_SENSIBLE = Pattern.compile(
-            "(?i).*(password|contrase|clave|secret|token|authorization|tarjeta|card|cvv|cvc|payment_?method|metodo_?pago).*");
+            "(?i)(?:password|contrase|clave|secret|token|authorization|tarjeta|card|cvv|cvc|payment_?method|metodo_?pago)");
     private static final Pattern VALOR_TARJETA = Pattern.compile("(?<![\\w-])(?:\\d[ -]?){12,18}\\d(?![\\w-])");
     private static final Pattern VALOR_JWT = Pattern.compile("eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*");
     private static final Pattern VALOR_BEARER = Pattern.compile("(?i)bearer\\s+\\S+");
@@ -51,7 +51,7 @@ public final class StructuredLogFormatter {
     private static void valor(StringBuilder sb, Object v, String clave) {
         if (v == null) {
             sb.append("null");
-        } else if (clave != null && CLAVE_SENSIBLE.matcher(clave).matches()) {
+        } else if (clave != null && CLAVE_SENSIBLE.matcher(clave).find()) {
             sb.append('"').append(OCULTO).append('"');
         } else if (v instanceof Map<?, ?> m) {
             sb.append('{');

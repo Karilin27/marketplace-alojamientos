@@ -47,7 +47,7 @@ public class LoginService {
         this.codificador = codificador;
         this.emisor = emisor;
         this.log = log;
-        this.hashSenuelo = codificador.encode("senuelo-para-tiempo-constante");
+        this.hashSenuelo = codificador.encode(java.util.UUID.randomUUID().toString());   // hash aleatorio para tiempo constante
     }
 
     public LoginRespuesta iniciarSesion(LoginSolicitud solicitud) {
