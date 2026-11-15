@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Marketplace de Alojamientos – Flujo completo S1, S3, S4, S5 y S6",
-    "description": "Complementa las colecciones de S2 (alojamientos) y S5 (reseñas). Cubre registro, login, perfil, recuperación de acceso, disponibilidad, cotización, reserva con Idempotency-Key, pago de prueba, cancelación, notificaciones y administración. Ejecutar en orden:\nnewman run api/Marketplace-flujo-completo.postman_collection.json --env-var baseUrl=https://marketplace-alojamientos-api.onrender.com --env-var adminCorreo=admin.demo@test.com --env-var adminContrasena=<contraseña>\nUsa el alojamiento de prueba A-01 (idAlojamiento) y fechas aleatorias lejanas para no chocar con otras reservas.",
+    "description": "Complementa las colecciones de S2 (alojamientos) y S5 (reseñas). Cubre registro, login, perfil, recuperación de acceso, disponibilidad, cotización, reserva con Idempotency-Key, pago de prueba, cancelación, notificaciones y administración. Ejecutar en orden:\nnewman run api/Marketplace-flujo-completo.postman_collection.json --env-var baseUrl=https://marketplace-alojamientos-api.onrender.com --env-var adminCorreo=admin.demo@test.com --env-var adminContrasena=<contraseña>\nUsa el alojamiento de prueba A-01 (idAlojamiento) y fechas aleatorias lejanas para no chocar con otras reservas.\nNota: la prueba de pago rechazado (4.1) usa una segunda reserva (4.0a y 4.0b), porque un pago rechazado deja la reserva en RECHAZADA y ya no se puede pagar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -887,6 +887,106 @@
       "name": "S4 Pagos",
       "item": [
         {
+          "name": "4.0a Cotizar otra estancia para la prueba de pago rechazado (HU-011)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"tokenCotizacion2\", pm.response.json().tokenCotizacion);"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const l = new Date(pm.collectionVariables.get(\"llegada\"));",
+                  "const f = n => { const x = new Date(l); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };",
+                  "pm.collectionVariables.set(\"llegada2\", f(10));",
+                  "pm.collectionVariables.set(\"salida2\", f(12));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenHuesped}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/quotes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "quotes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idAlojamiento\": \"{{idAlojamiento}}\",\n  \"fechaLlegada\": \"{{llegada2}}\",\n  \"fechaSalida\": \"{{salida2}}\",\n  \"huespedes\": 2,\n  \"idsServiciosAdicionales\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "4.0b Crear la segunda reserva (HU-012)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Creada\", () => pm.expect(pm.response.code).to.be.oneOf([200,201]));",
+                  "pm.collectionVariables.set(\"idReservaRechazo\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenHuesped}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "bookings"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tokenCotizacion\": \"{{tokenCotizacion2}}\"\n}"
+            }
+          }
+        },
+        {
           "name": "4.1 Pago rechazado con tarjeta de prueba (HU-013)",
           "event": [
             {
@@ -927,7 +1027,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"idReserva\": \"{{idReserva}}\",\n  \"metodoPago\": \"pm_card_chargeDeclined\"\n}"
+              "raw": "{\n  \"idReserva\": \"{{idReservaRechazo}}\",\n  \"metodoPago\": \"pm_card_chargeDeclined\"\n}"
             }
           }
         },
@@ -1180,7 +1280,7 @@
                 "exec": [
                   "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
                   "const j = pm.response.json();",
-                  "const lista = j.items || j;",
+                  "const lista = j.contenido || j.items || j;",
                   "if (lista.length) pm.collectionVariables.set(\"idNotificacion\", lista[0].id);"
                 ]
               }
