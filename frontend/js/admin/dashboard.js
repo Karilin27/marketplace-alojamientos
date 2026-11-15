@@ -12,7 +12,7 @@
       var d = await A.dashboard();
       var k = $('kpis'); k.textContent = '';
       k.appendChild(kpi(d.usuarios, 'Usuarios registrados'));
-      Object.keys(d.usuariosPorRol).forEach(function (r) { k.appendChild(kpi(d.usuariosPorRol[r], r.charAt(0) + r.slice(1).toLowerCase() + 's')); });
+      Object.keys(d.usuariosPorRol).forEach(function (r) { k.appendChild(kpi(d.usuariosPorRol[r], ({ ADMINISTRADOR: 'Administradores', ANFITRION: 'Anfitriones', HUESPED: 'Huéspedes' })[r] || r)); });
       k.appendChild(kpi(d.publicacionesActivas, 'Publicaciones activas'));
       k.appendChild(kpi(window.cop(d.ingresosEstimados), 'Ingresos estimados (confirmadas y completadas)'));
       var t = $('por-estado'); t.textContent = '';
