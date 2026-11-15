@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 public final class ReglasRegistro {
 
     private static final Pattern CORREO = Pattern.compile(
-            "^[A-Za-z0-9_%+-]+(?:\\.[A-Za-z0-9_%+-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\\.)+[A-Za-z]{2,}$");
+            "^[A-Za-z0-9_%+-]++(?:\\.[A-Za-z0-9_%+-]++)*+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)++[A-Za-z]{2,63}+$");
 
     /** CA-04: el rol ADMINISTRADOR no se puede elegir al registrarse. */
     static final Set<String> ROLES_PERMITIDOS = Set.of("HUESPED", "ANFITRION");

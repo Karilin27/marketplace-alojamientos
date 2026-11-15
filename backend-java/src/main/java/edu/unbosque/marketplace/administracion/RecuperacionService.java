@@ -91,6 +91,9 @@ public class RecuperacionService {
     }
 
     static String hash(String token) {
+        if (token == null) {
+            throw new IllegalArgumentException("token requerido");
+        }
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                     .digest(token.getBytes(StandardCharsets.UTF_8)));

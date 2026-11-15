@@ -40,6 +40,21 @@ public class ReporteService {
 
     /** Archivo generado: contenido, tipo MIME y nombre sugerido. */
     public record Archivo(byte[] contenido, String tipoMime, String nombre) {
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Archivo a && java.util.Arrays.equals(contenido, a.contenido)
+                    && java.util.Objects.equals(tipoMime, a.tipoMime) && java.util.Objects.equals(nombre, a.nombre);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * java.util.Objects.hash(tipoMime, nombre) + java.util.Arrays.hashCode(contenido);
+        }
+
+        @Override
+        public String toString() {
+            return "Archivo[" + nombre + ", " + tipoMime + ", " + (contenido == null ? 0 : contenido.length) + " bytes]";
+        }
     }
 
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
