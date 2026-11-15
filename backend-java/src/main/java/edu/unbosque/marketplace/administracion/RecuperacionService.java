@@ -91,12 +91,10 @@ public class RecuperacionService {
     }
 
     static String hash(String token) {
-        if (token == null) {
-            throw new IllegalArgumentException("token requerido");
-        }
+        String valor = token == null ? "" : token;                                  // nunca coincide con un token real
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
-                    .digest(token.getBytes(StandardCharsets.UTF_8)));
+                    .digest(valor.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }

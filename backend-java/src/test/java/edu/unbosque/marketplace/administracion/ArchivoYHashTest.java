@@ -2,13 +2,13 @@ package edu.unbosque.marketplace.administracion;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.unbosque.marketplace.administracion.ReporteService.Archivo;
 import org.junit.jupiter.api.Test;
 
-/** Hallazgos de SonarCloud: igualdad del archivo exportado (java:S6218) y hash del token (javabugs:S2259). */
+/** Hallazgos de SonarCloud: igualdad del archivo exportado (java:S6218) y hash del token (javabugs:S2259, sin lanzar excepciones). */
 class ArchivoYHashTest {
 
     @Test
@@ -17,7 +17,6 @@ class ArchivoYHashTest {
         Archivo b = new Archivo(new byte[] {1, 2, 3}, "application/pdf", "reporte.pdf");
         assertEquals(a, b);
         assertEquals(a.hashCode(), b.hashCode());
-        assertEquals(a, a);
     }
 
     @Test
@@ -26,7 +25,8 @@ class ArchivoYHashTest {
         assertNotEquals(a, new Archivo(new byte[] {9}, "application/pdf", "reporte.pdf"));
         assertNotEquals(a, new Archivo(new byte[] {1, 2, 3}, "text/plain", "reporte.pdf"));
         assertNotEquals(a, new Archivo(new byte[] {1, 2, 3}, "application/pdf", "otro.pdf"));
-        assertNotEquals(a, "reporte.pdf");
+        Object otroTipo = "reporte.pdf";
+        assertFalse(a.equals(otroTipo));
     }
 
     @Test
@@ -43,7 +43,8 @@ class ArchivoYHashTest {
     }
 
     @Test
-    void hashSinTokenSeRechaza() {
-        assertThrows(IllegalArgumentException.class, () -> RecuperacionService.hash(null));
+    void hashSinTokenNoFallaYNoCoincideConTokensReales() {
+        assertEquals(RecuperacionService.hash(""), RecuperacionService.hash(null));
+        assertNotEquals(RecuperacionService.hash("test"), RecuperacionService.hash(null));
     }
 }
