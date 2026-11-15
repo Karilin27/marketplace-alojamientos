@@ -36,6 +36,8 @@
     revisiones: function () { return llamar('GET', '/api/admin/bookings/manual-review'); },
     cerrarRevision: function (id, decision) { return llamar('PATCH', '/api/admin/bookings/' + id + '/manual-review', { decision: decision }); },
     auditoria: function (f) { return llamar('GET', '/api/admin/audit' + q(f)); },
+    tarifaServicio: function () { return llamar('GET', '/api/admin/settings/service-fee'); },
+    guardarTarifaServicio: function (porcentaje) { return llamar('PUT', '/api/admin/settings/service-fee', { porcentaje: porcentaje }); },
   };
 
   window.el = window.el || function (tag, at, hijos) {

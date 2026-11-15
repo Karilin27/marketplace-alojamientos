@@ -13,6 +13,7 @@ const revisiones = []; const auditoria = []; let tokens = {};
 const json = (res, s, b) => { res.writeHead(s, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Methods': '*', 'Access-Control-Expose-Headers': 'Content-Disposition' }); res.end(b === undefined ? '' : JSON.stringify(b)); };
 const leer = (req) => new Promise((ok) => { let b = ''; req.on('data', (c) => (b += c)); req.on('end', () => ok(b ? JSON.parse(b) : null)); });
 const audit = (accion, entidad) => auditoria.unshift({ id: crypto.randomUUID(), usuario: 'Admin', entidad, idEntidad: '', accion, resultado: 'EXITO', fecha: new Date().toISOString() });
+let tarifa = 10;
 async function api(req, res, url) {
   const p = url.pathname, m = req.method; let r;
   if (m === 'OPTIONS') return json(res, 204);
@@ -23,6 +24,8 @@ async function api(req, res, url) {
     delete tokens[b.token]; return json(res, 200, { mensaje: 'Su contraseña fue actualizada. Ya puede iniciar sesión.' }); }
   if (p === '/api/admin/dashboard') return json(res, 200, { usuarios: 2, usuariosPorRol: { ADMINISTRADOR: 1, HUESPED: 1 }, publicacionesActivas: pubs.filter((x) => x.estado === 'ACTIVA').length,
     reservasPorEstado: { CONFIRMADA: 1, COMPLETADA: 1, CANCELADA: 1, RECHAZADA: 1, PENDIENTE_PAGO: 0 }, ingresosEstimados: 1450000, ciudadesMayorDemanda: [{ ciudad: 'Bogotá', reservas: 2 }], calculadoEn: new Date().toISOString() });
+  if (p === '/api/admin/settings/service-fee') { if (m === 'PUT') { const b = await leer(req); tarifa = b.porcentaje; audit('TARIFA_SERVICIO_CAMBIADA', 'parametro'); }
+    return json(res, 200, { porcentaje: tarifa }); }
   if (p === '/api/admin/reports/export') { const b = await leer(req); audit('REPORTE_EXPORTADO', 'reporte');
     res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="reporte-' + b.tipo.toLowerCase() + '.pdf"', 'Access-Control-Allow-Origin': '*', 'Access-Control-Expose-Headers': 'Content-Disposition' }); return res.end('%PDF-1.4 prueba'); }
   if (p === '/api/admin/users') return json(res, 200, usuarios);
@@ -68,6 +71,11 @@ const servidor = (port) => new Promise((ok) => { const s = http.createServer(asy
   assert.match(await page.textContent('#kpis'), /1\.450\.000/); assert.match(await page.textContent('#ciudades'), /Bogotá/); paso('HU-020 CP-20-01: indicadores e ingresos estimados');
   await page.selectOption('#tipo', 'RESERVAS'); const [descarga] = await Promise.all([page.waitForEvent('download'), page.click('#btn-exportar')]);
   assert.equal(descarga.suggestedFilename(), 'reporte-reservas.pdf'); paso('HU-021 CP-21-01: descarga del reporte PDF');
+  await page.waitForFunction(() => document.getElementById('porcentaje').value === '10'); paso('RN-17: muestra la tarifa de servicio vigente');
+  await page.fill('#porcentaje', '150'); await page.click('#btn-tarifa');
+  assert.match(await page.textContent('#e-porcentaje'), /entre 0 y 100/); paso('RN-17: rechaza un porcentaje fuera de rango');
+  await page.fill('#porcentaje', '12.5'); await page.click('#btn-tarifa');
+  await page.waitForFunction(() => /12\.5 %/.test(document.getElementById('mensaje').textContent)); paso('RN-17: el administrador cambia la tarifa de servicio');
   // HU-022
   await page.goto(base + '/pages/admin/usuarios.html'); await page.waitForSelector('#tabla tr:nth-child(3)');
   await page.click('#tabla button.peligro'); await page.waitForFunction(() => /motivo/.test(document.getElementById('mensaje').textContent)); paso('HU-022 CP-18-04: restringir sin motivo');

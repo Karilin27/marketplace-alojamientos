@@ -35,3 +35,25 @@ jobs:
           -Dsonar.organization=karilin27
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.qualitygate.wait=true
+
+  frontend:
+    runs-on: ubuntu-24.04   # Playwright aun no soporta Chromium en Ubuntu 26 (ubuntu-latest)
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Pruebas unitarias del frontend (node --test)
+        run: node --test test/*.test.js
+      - name: Instalar Playwright (Chromium)
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.0
+          npx playwright install --with-deps chromium
+      - name: Pruebas de punta a punta contra la API simulada
+        run: |
+          node test/e2e/e2e.js
+          node test/e2e/e2e-alojamientos.js
+          node test/e2e/e2e-admin.js
