@@ -97,8 +97,11 @@
     var enlaces = [['buscar', 'Buscar alojamientos']];
     if (u && u.rol === 'ANFITRION') enlaces.push(['mis-publicaciones', 'Mis publicaciones'], ['publicar', 'Publicar']);
     if (u && u.rol === 'ADMINISTRADOR') enlaces.push(['../resenas/moderar', 'Moderar reseñas']);
-    if (token()) enlaces.push(['../reservas/mis-reservas', 'Mis reservas']);
-    else enlaces.push(['../login', 'Iniciar sesión'], ['../register', 'Registrarse']);
+    if (token()) {                                                   // la sección de reservas depende del rol
+      if (u && u.rol === 'ANFITRION') enlaces.push(['../reservas/recibidas', 'Reservas recibidas']);
+      else if (u && u.rol === 'ADMINISTRADOR') enlaces.push(['../admin/dashboard', 'Panel de administración']);
+      else enlaces.push(['../reservas/mis-reservas', 'Mis reservas']);
+    } else enlaces.push(['../login', 'Iniciar sesión'], ['../register', 'Registrarse']);
     barra.appendChild(window.el('a', { clase: 'marca', href: '../../index.html', texto: 'Marketplace · Alojamientos' }));
     enlaces.forEach(function (e) {
       var ruta = enOtraCarpeta && e[0].indexOf('../') !== 0 ? '../alojamientos/' + e[0] : e[0];

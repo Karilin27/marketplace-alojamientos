@@ -4,14 +4,18 @@
   var L = window.ReservasLogica, A = window.ReservasApi;
   var barra = document.getElementById('barra');
   var actual = barra.getAttribute('data-actual');
-  var enlaces = [
-    ['../alojamientos/buscar', 'Buscar alojamientos'],
-    ['mis-reservas', 'Mis reservas'], ['recibidas', 'Reservas recibidas'], ['notificaciones', 'Notificaciones'],
-  ];
-  try {                                                         // S2: acceso del anfitrión a sus publicaciones
-    var u = JSON.parse(localStorage.getItem('usuario') || 'null');
-    if (u && u.rol === 'ANFITRION') enlaces.splice(1, 0, ['../alojamientos/mis-publicaciones', 'Mis publicaciones']);
-  } catch (e) { /* sin almacenamiento */ }
+  // Cada rol ve solo las secciones que el servidor le permite (el anfitrión no reserva; el huésped no recibe reservas).
+  var rol = null;
+  try { rol = (JSON.parse(localStorage.getItem('usuario') || 'null') || {}).rol; } catch (e) { /* sin almacenamiento */ }
+  var enlaces = [['../alojamientos/buscar', 'Buscar alojamientos']];
+  if (rol === 'ANFITRION') enlaces.push(['../alojamientos/mis-publicaciones', 'Mis publicaciones'], ['recibidas', 'Reservas recibidas']);
+  else if (rol === 'ADMINISTRADOR') enlaces.push(['../admin/dashboard', 'Panel de administración']);
+  else enlaces.push(['mis-reservas', 'Mis reservas']);
+  enlaces.push(['notificaciones', 'Notificaciones']);
+  // Si alguien abre la sección del otro rol (por un enlace guardado), se le lleva a la suya.
+  if (actual === 'mis-reservas' && rol === 'ANFITRION') { window.location.replace('recibidas.html'); return; }
+  if (actual === 'recibidas' && rol === 'HUESPED') { window.location.replace('mis-reservas.html'); return; }
+  if ((actual === 'mis-reservas' || actual === 'recibidas') && rol === 'ADMINISTRADOR') { window.location.replace('../admin/dashboard.html'); return; }
   var marca = document.createElement('a'); marca.className = 'marca'; marca.href = '../../index.html'; marca.textContent = 'Marketplace · Reservas';
   barra.appendChild(marca);
   enlaces.forEach(function (e) {
