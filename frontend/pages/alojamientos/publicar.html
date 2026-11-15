@@ -30,7 +30,15 @@
       </div>
       <fieldset style="border:0;padding:0;margin:12px 0 0"><legend style="font-weight:600">Servicios</legend><div class="casillas" id="servicios"></div></fieldset>
       <label for="reglas">Reglas de la casa</label><textarea id="reglas" rows="2"></textarea>
-      <label for="imagenes">Imágenes (una URL por línea, máximo 10)</label><textarea id="imagenes" rows="3" placeholder="https://..."></textarea><p class="error-campo" id="e-imagenes"></p>
+      <label for="imagenes">Imágenes (máximo 10)</label>
+      <div class="subir-fotos">
+        <input type="file" id="archivos" accept="image/jpeg,image/png,image/webp" multiple class="oculto-visual" aria-describedby="ayuda-fotos">
+        <label for="archivos" class="boton secundario">Subir fotos desde tu computador</label>
+        <span class="suave" id="ayuda-fotos">JPG, PNG o WEBP de hasta 5 MB. También puedes pegar una URL por línea.</span>
+      </div>
+      <p class="suave" id="estado-fotos" role="status" aria-live="polite"></p>
+      <textarea id="imagenes" rows="3" placeholder="https://..." aria-label="Enlaces de las imágenes, uno por línea"></textarea><p class="error-campo" id="e-imagenes"></p>
+      <div class="vista-fotos" id="vista-fotos"></div>
       <label for="politica">Política de cancelación</label>
       <select id="politica"><option value="">Elegir más tarde</option></select>
       <p class="suave" id="politica-ayuda">Necesitas una política para activar la publicación.</p>

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Marketplace de Alojamientos – Inversiones LR
-  version: 1.1.0
+  version: 1.2.0
   description: 'Contrato de los servicios REST S1 a S6 del Marketplace de Alojamientos (Ingeniería de Software 1, Universidad
     El Bosque).
 
@@ -16,7 +16,10 @@ info:
 
 
     - Versión 1.1.0 (14 de noviembre de 2026): alineado con el código desplegado. Un solo servicio Java con S1 a S6 (D-20);
-    identificadores UUID; moderación con PATCH; auditoría interna sin endpoint.'
+    identificadores UUID; moderación con PATCH; auditoría interna sin endpoint.
+
+    - Versión 1.2.0 (14 de noviembre de 2026): POST /api/accommodations/images para subir fotos desde el computador a
+    Supabase Storage (decisión D-21).'
 servers:
 - url: https://marketplace-alojamientos-api.onrender.com
   description: Producción (Render) – Java Spring Boot S1 a S6
@@ -522,6 +525,54 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TarifasRequest'
+  /api/accommodations/images:
+    post:
+      tags:
+      - S2 Alojamientos
+      summary: Subir una foto desde el computador
+      description: 'Sube una imagen JPG, PNG o WEBP (máximo 5 MB) a Supabase Storage y devuelve su URL pública, que el
+        frontend agrega a la lista de imágenes de la publicación. El formato se detecta por el contenido del archivo.
+
+
+        **Rol:** Anfitrión. **Historia:** HU-005 CA-03 y HU-006 (cambio D-21).'
+      operationId: subirImagenAlojamiento
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - archivo
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Imagen guardada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagenSubida'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          description: La imagen supera 5 MB (IMAGEN_MUY_GRANDE)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Subida no configurada (SUBIDA_NO_CONFIGURADA) o almacenamiento no disponible (ALMACEN_NO_DISPONIBLE)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/cancellation-policies:
     get:
       tags:
@@ -1584,6 +1635,22 @@ components:
           type: integer
         porcentajeDevolucion:
           type: number
+    ImagenSubida:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          example: https://jbduahwlsbfejwqrpwgw.supabase.co/storage/v1/object/public/alojamientos/<id-anfitrion>/<uuid>.jpg
+        bytes:
+          type: integer
+          format: int64
+        tipo:
+          type: string
+          enum:
+          - image/jpeg
+          - image/png
+          - image/webp
     Alojamiento:
       type: object
       properties:

@@ -32,3 +32,23 @@ test('HU-024 CA-05: tarifa negativa y servicio repetido (CP-05-05)', () => {
 test('imágenes: una URL por línea', () => {
   assert.deepEqual(L.lineas(' https://a/1.jpg \n\nhttps://a/2.jpg'), ['https://a/1.jpg', 'https://a/2.jpg']);
 });
+
+// D-21 — subida de fotos desde el computador
+test('D-21: validarArchivoImagen acepta JPG, PNG y WEBP de hasta 5 MB', () => {
+  assert.equal(L.validarArchivoImagen({ name: 'a.jpg', type: 'image/jpeg', size: 1000 }), '');
+  assert.equal(L.validarArchivoImagen({ name: 'a.png', type: 'image/png', size: L.MAX_BYTES_IMAGEN }), '');
+  assert.equal(L.validarArchivoImagen({ name: 'a.webp', type: 'IMAGE/WEBP', size: 10 }), '');
+  assert.match(L.validarArchivoImagen({ name: 'a.gif', type: 'image/gif', size: 10 }), /JPG, PNG ni WEBP/);
+  assert.match(L.validarArchivoImagen({ name: 'a.pdf', type: '', size: 10 }), /no es JPG/);
+  assert.match(L.validarArchivoImagen({ name: 'g.jpg', type: 'image/jpeg', size: L.MAX_BYTES_IMAGEN + 1 }), /5 MB/);
+  assert.ok(L.validarArchivoImagen(null));
+});
+
+test('D-21: cupo de imágenes y agregar URL sin repetir', () => {
+  assert.equal(L.cupoImagenes(''), 10);
+  assert.equal(L.cupoImagenes('https://a\nhttps://b\n\n'), 8);
+  assert.equal(L.cupoImagenes(Array(12).fill('https://x').join('\n')), 0);
+  assert.equal(L.agregarUrl('', 'https://a'), 'https://a');
+  assert.equal(L.agregarUrl('https://a\n', 'https://b'), 'https://a\nhttps://b');
+  assert.equal(L.agregarUrl('https://a', 'https://a'), 'https://a');
+});

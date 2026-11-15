@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -52,6 +53,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorRespuesta> parametro(MethodArgumentTypeMismatchException e) {
         return ResponseEntity.badRequest().body(new ErrorRespuesta("PARAMETRO_INVALIDO",
                 "El parámetro '" + e.getName() + "' tiene un formato inválido.", List.of(e.getName())));
+    }
+
+    /** Archivo más grande que spring.servlet.multipart.max-file-size (subida de imágenes, D-21). */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorRespuesta> archivoGrande(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(new ErrorRespuesta("IMAGEN_MUY_GRANDE",
+                "La imagen supera el máximo de 5 MB.", List.of("archivo: máximo 5 MB")));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
