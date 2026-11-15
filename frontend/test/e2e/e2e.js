@@ -16,7 +16,7 @@ const assert = require('node:assert/strict');
   const paso = (n) => console.log('OK  ' + n);
 
   // 1) validación en cliente
-  await page.goto(`${base}/reservas/reservar.html?alojamiento=${ALOJ}`);
+  await page.goto(`${base}/pages/reservas/reservar.html?alojamiento=${ALOJ}`);
   await page.click('#btn-cotizar');
   assert.match(await page.textContent('#e-llegada'), /llegada/i); paso('validación: llegada obligatoria');
   await page.fill('#llegada', fecha(30)); await page.fill('#salida', fecha(30)); await page.click('#btn-cotizar');
@@ -41,7 +41,7 @@ const assert = require('node:assert/strict');
   assert.match(await page.textContent('#resumen'), /Confirmada/); paso('pago aprobado -> reserva Confirmada');
 
   // 5) mis reservas y cancelación con devolución estimada
-  await page.goto(`${base}/reservas/mis-reservas.html`);
+  await page.goto(`${base}/pages/reservas/mis-reservas.html`);
   await page.waitForSelector('#lista li strong');
   assert.match(await page.textContent('#lista'), /Confirmada/); paso('mis reservas lista la reserva');
   await page.click('text=Cancelar reserva');
@@ -51,7 +51,7 @@ const assert = require('node:assert/strict');
   assert.match(await page.textContent('#lista'), /Reembolso/); paso('cancelación -> Cancelada con reembolso');
 
   // 6) notificaciones
-  await page.goto(`${base}/reservas/notificaciones.html`);
+  await page.goto(`${base}/pages/reservas/notificaciones.html`);
   await page.waitForSelector('#lista li.no-leida');
   const antes = await page.$$eval('#lista li.no-leida', (l) => l.length);
   await page.click('#lista li.no-leida button'); await page.waitForTimeout(200);
@@ -59,14 +59,14 @@ const assert = require('node:assert/strict');
   assert.equal(despues, antes - 1); paso('marcar notificación como leída');
 
   // 7) pago rechazado
-  await page.goto(`${base}/reservas/reservar.html?alojamiento=${ALOJ}`);
+  await page.goto(`${base}/pages/reservas/reservar.html?alojamiento=${ALOJ}`);
   await page.fill('#llegada', fecha(60)); await page.fill('#salida', fecha(62)); await page.click('#btn-cotizar');
   await page.waitForSelector('#cotizacion:not(.oculto)'); await page.click('#btn-reservar'); await page.waitForURL(/pago\.html/);
   await page.selectOption('#metodo', 'pm_card_chargeDeclined'); await page.click('#btn-pagar');
   await page.waitForSelector('#mensaje .error'); assert.match(await page.textContent('#mensaje'), /rechazado/i); paso('pago rechazado muestra el error');
 
   // 8) disponibilidad del anfitrión
-  await page.goto(`${base}/reservas/disponibilidad.html?alojamiento=${ALOJ}`);
+  await page.goto(`${base}/pages/reservas/disponibilidad.html?alojamiento=${ALOJ}`);
   await page.click('#agregar'); await page.click('#guardar');
   assert.match(await page.textContent('#mensaje'), /faltan fechas/); paso('disponibilidad: valida periodos incompletos');
   const f = page.locator('#filas > div').first();

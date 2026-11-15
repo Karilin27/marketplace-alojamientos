@@ -29,6 +29,16 @@
         </div>
         <div class="acciones"><button type="submit" id="btn-exportar">Descargar</button><button type="button" class="secundario" id="btn-actualizar">Actualizar indicadores</button></div>
       </form>
+      <form class="card" id="form-tarifa" novalidate>
+        <h2>Tarifa de servicio del marketplace</h2>
+        <p class="suave">Porcentaje que se suma al precio de cada reserva (RN-17). El cambio aplica a las cotizaciones nuevas.</p>
+        <div class="fila">
+          <div><label for="porcentaje">Porcentaje (%)</label>
+            <input id="porcentaje" type="number" min="0" max="100" step="0.5" inputmode="decimal">
+            <span class="error" id="e-porcentaje"></span></div>
+        </div>
+        <div class="acciones"><button type="submit" id="btn-tarifa">Guardar tarifa</button></div>
+      </form>
     </div>
   </main>
   <script src="../../js/config.js"></script>

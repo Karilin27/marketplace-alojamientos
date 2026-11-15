@@ -36,5 +36,21 @@
     } catch (e) { window.mostrarMensaje(e.mensaje, 'error'); } finally { $('btn-exportar').disabled = false; }
   });
   $('btn-actualizar').addEventListener('click', cargar);
+
+  // HU-024 CA-04 / RN-17: el administrador configura el porcentaje de la tarifa de servicio
+  async function cargarTarifa() {
+    try { $('porcentaje').value = (await A.tarifaServicio()).porcentaje; } catch (e) { window.mostrarMensaje(e.mensaje, 'error'); }
+  }
+  $('form-tarifa').addEventListener('submit', async function (ev) {
+    ev.preventDefault(); window.mostrarMensaje(''); $('e-porcentaje').textContent = '';
+    var v = $('porcentaje').value.trim(), n = Number(v);
+    if (v === '' || !isFinite(n) || n < 0 || n > 100) { $('e-porcentaje').textContent = 'Escriba un porcentaje entre 0 y 100.'; return; }
+    $('btn-tarifa').disabled = true;
+    try {
+      var r = await A.guardarTarifaServicio(n);
+      window.mostrarMensaje('Tarifa de servicio actualizada a ' + r.porcentaje + ' %. El cambio quedó registrado en la auditoría.', 'exito');
+    } catch (e) { window.mostrarMensaje(e.mensaje, 'error'); } finally { $('btn-tarifa').disabled = false; }
+  });
   cargar();
+  cargarTarifa();
 })();

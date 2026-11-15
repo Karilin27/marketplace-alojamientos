@@ -46,6 +46,10 @@
   }
 
   async function cargar() {
+    var contenedor = $('lista');
+    if (!contenedor.children.length) {                               // el servidor gratuito puede tardar en responder
+      contenedor.appendChild(el('p', { clase: 'suave', texto: 'Cargando tus publicaciones… (la primera carga puede tardar hasta un minuto)' }));
+    }
     try {
       var lista = await A.mias();
       var c = $('lista'); c.textContent = '';

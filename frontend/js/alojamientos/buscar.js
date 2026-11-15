@@ -43,6 +43,7 @@
     $('e-filtros').textContent = L.validarFiltros(f, hoy);
     if ($('e-filtros').textContent) return;
     window.mostrarMensaje(''); $('btn-buscar').disabled = true;
+    $('resumen').textContent = 'Buscando alojamientos… (la primera búsqueda puede tardar hasta un minuto mientras se activa el servidor)';
     try {
       var r = await A.buscar(f);
       var cont = $('resultados'); cont.textContent = '';
@@ -58,6 +59,7 @@
       $('pagina').textContent = 'Página ' + (pagina + 1) + ' de ' + paginas;
       $('anterior').disabled = pagina === 0; $('siguiente').disabled = pagina + 1 >= paginas;
     } catch (e) {
+      $('resumen').textContent = '';
       window.mostrarMensaje(e.mensaje, 'error');
     } finally { $('btn-buscar').disabled = false; }
   }
