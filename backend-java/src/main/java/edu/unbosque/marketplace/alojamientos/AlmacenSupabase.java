@@ -32,10 +32,20 @@ public class AlmacenSupabase implements AlmacenImagenes {
     }
 
     AlmacenSupabase(String url, String llave, String bucket, HttpClient http) {
-        this.url = url == null ? "" : url.strip().replaceAll("/+$", "");
+        this.url = sinBarraFinal(url);
         this.llave = llave == null ? "" : llave.strip();
         this.bucket = bucket == null || bucket.isBlank() ? "alojamientos" : bucket.strip();
         this.http = http;
+    }
+
+    /** Quita las barras finales sin expresión regular (java:S8786). */
+    static String sinBarraFinal(String valor) {
+        String limpio = valor == null ? "" : valor.strip();
+        int fin = limpio.length();
+        while (fin > 0 && limpio.charAt(fin - 1) == '/') {
+            fin--;
+        }
+        return limpio.substring(0, fin);
     }
 
     @Override

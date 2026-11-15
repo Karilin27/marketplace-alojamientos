@@ -89,4 +89,12 @@ class AlmacenSupabaseTest {
         assertFalse(almacen(base, "  ").configurado());
         assertFalse(new AlmacenSupabase(null, null, null).configurado());
     }
+
+    @Test
+    void quitaLasBarrasFinalesDeLaUrl() {
+        org.junit.jupiter.api.Assertions.assertEquals("https://x.supabase.co", AlmacenSupabase.sinBarraFinal(" https://x.supabase.co/// "));
+        org.junit.jupiter.api.Assertions.assertEquals("https://x.supabase.co", AlmacenSupabase.sinBarraFinal("https://x.supabase.co"));
+        org.junit.jupiter.api.Assertions.assertEquals("", AlmacenSupabase.sinBarraFinal(null));
+        org.junit.jupiter.api.Assertions.assertEquals("", AlmacenSupabase.sinBarraFinal("///"));
+    }
 }
