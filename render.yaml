@@ -21,7 +21,9 @@ services:
       - key: COTIZACION_SECRET
         generateValue: true
       - key: PASARELA
-        value: simulada
+        value: stripe            # Stripe en modo prueba (enunciado: pagos con Stripe para pruebas)
+      - key: STRIPE_API_KEY
+        sync: false              # solo llaves de prueba sk_test_...; se carga a mano en el panel de Render
       - key: CORS_ORIGENES
         sync: false
       - key: SUPABASE_URL
