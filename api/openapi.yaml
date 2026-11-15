@@ -1,0 +1,2168 @@
+openapi: 3.0.3
+info:
+  title: Marketplace de Alojamientos – Inversiones LR
+  version: 1.1.0
+  description: 'Contrato de los servicios REST S1 a S6 del Marketplace de Alojamientos (Ingeniería de Software 1, Universidad
+    El Bosque).
+
+
+    - Autenticación con token Bearer; rutas públicas: registro, login, recuperación, búsqueda, detalle, calendario y reseñas.
+
+    - Crear reserva, pagar y cancelar exigen la cabecera Idempotency-Key (RN-12).
+
+    - Errores con formato {codigo, mensaje, detalles}. Fechas ISO 8601; montos con dos decimales.
+
+    - Trazabilidad: cada operación indica su rol y su historia de usuario (Confluence, páginas 08, 11 y 13).
+
+
+    - Versión 1.1.0 (14 de noviembre de 2026): alineado con el código desplegado. Un solo servicio Java con S1 a S6 (D-20);
+    identificadores UUID; moderación con PATCH; auditoría interna sin endpoint.'
+servers:
+- url: https://marketplace-alojamientos-api.onrender.com
+  description: Producción (Render) – Java Spring Boot S1 a S6
+- url: http://localhost:8080
+  description: Local
+tags:
+- name: S1 Identidad y Usuarios
+- name: S2 Alojamientos
+- name: S3 Reservas y Disponibilidad
+- name: S4 Pagos
+- name: S5 Notificaciones y Reseñas
+- name: S6 Administración y Reportes
+security:
+- bearerAuth: []
+paths:
+  /api/auth/register:
+    post:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Registrar usuario
+      description: 'Crea una cuenta ACTIVA con rol HUÉSPED o ANFITRIÓN. No permite el rol ADMINISTRADOR ni correos duplicados.
+
+
+        **Rol:** Público. **Historia:** HU-001.'
+      operationId: registrarUsuario
+      responses:
+        '201':
+          description: Cuenta creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistroRequest'
+      security: []
+  /api/auth/login:
+    post:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Iniciar sesión
+      description: 'Valida credenciales y estado de la cuenta (RN-24) y emite el token de sesión.
+
+
+        **Rol:** Público. **Historia:** HU-002.'
+      operationId: iniciarSesion
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SesionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      security: []
+  /api/auth/password-recovery:
+    post:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Solicitar recuperación de acceso
+      description: 'Genera un token de un solo uso con vigencia de 30 minutos y lo entrega de forma simulada. Responde el
+        mismo mensaje aunque el correo no exista.
+
+
+        **Rol:** Público. **Historia:** HU-003.'
+      operationId: solicitarRecuperacion
+      responses:
+        '200':
+          description: Solicitud recibida (mensaje genérico)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensaje'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecuperacionRequest'
+      security: []
+  /api/auth/password-reset:
+    post:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Restablecer contraseña
+      description: 'Valida el token (vigente y sin usar), actualiza la contraseña e invalida el token.
+
+
+        **Rol:** Público. **Historia:** HU-003.'
+      operationId: restablecerContrasena
+      responses:
+        '200':
+          description: Contraseña actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mensaje'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestablecerRequest'
+      security: []
+  /api/users/me:
+    get:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Consultar mi perfil
+      description: 'Devuelve los datos del usuario autenticado.
+
+
+        **Rol:** Autenticado. **Historia:** HU-004.'
+      operationId: consultarMiPerfil
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Actualizar mi perfil
+      description: 'Actualiza los datos permitidos del perfil.
+
+
+        **Rol:** Autenticado. **Historia:** HU-004.'
+      operationId: actualizarMiPerfil
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PerfilRequest'
+  /api/users/me/status:
+    patch:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Desactivar o reactivar mi cuenta
+      description: 'Desactivar se rechaza si hay reservas CONFIRMADAS futuras; al desactivar, las publicaciones ACTIVAS pasan
+        a PAUSADA (RN-24).
+
+
+        **Rol:** Autenticado. **Historia:** HU-004.'
+      operationId: cambiarEstadoMiCuenta
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoCuentaRequest'
+  /api/admin/users:
+    get:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Listar usuarios
+      description: 'Lista los usuarios con nombre, correo, rol y estado.
+
+
+        **Rol:** Administrador. **Historia:** HU-022.'
+      operationId: listarUsuarios
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaUsuarios'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+  /api/admin/users/{id}/status:
+    patch:
+      tags:
+      - S1 Identidad y Usuarios
+      summary: Restringir o reactivar usuario
+      description: 'Cambia la cuenta a RESTRINGIDA o ACTIVA con motivo obligatorio; notifica y registra auditoría (RN-14).
+
+
+        **Rol:** Administrador. **Historia:** HU-022.'
+      operationId: cambiarEstadoUsuario
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestriccionRequest'
+  /api/accommodations:
+    post:
+      tags:
+      - S2 Alojamientos
+      summary: Crear publicación
+      description: 'Crea la publicación en BORRADOR asociada al anfitrión autenticado. Valida capacidad > 0 y precio > 0.
+
+
+        **Rol:** Anfitrión. **Historia:** HU-005.'
+      operationId: crearPublicacion
+      responses:
+        '201':
+          description: Publicación creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlojamientoRequest'
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Buscar alojamientos
+      description: 'Devuelve solo publicaciones ACTIVAS que cumplen los filtros y, si se indican fechas, con disponibilidad
+        en todo el periodo (consulta a S3).
+
+
+        **Rol:** Público. **Historia:** HU-009.'
+      operationId: buscarAlojamientos
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaResultados'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      parameters:
+      - name: ciudad
+        in: query
+        schema:
+          type: string
+      - name: llegada
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: salida
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: huespedes
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: tipo
+        in: query
+        schema:
+          type: string
+      - name: precioMin
+        in: query
+        schema:
+          type: number
+      - name: precioMax
+        in: query
+        schema:
+          type: number
+      - name: servicios
+        in: query
+        description: Identificadores separados por coma
+        schema:
+          type: string
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+      security: []
+  /api/accommodations/mine:
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Listar mis publicaciones
+      description: 'Lista solo las publicaciones del anfitrión autenticado con su estado.
+
+
+        **Rol:** Anfitrión. **Historia:** HU-005, HU-007.'
+      operationId: listarMisPublicaciones
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alojamiento'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/accommodations/{id}:
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Consultar detalle
+      description: 'Detalle completo de una publicación ACTIVA (datos, servicios, reglas, imágenes y política de cancelación).
+
+
+        **Rol:** Público. **Historia:** HU-010.'
+      operationId: consultarDetalle
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      security: []
+    put:
+      tags:
+      - S2 Alojamientos
+      summary: Editar publicación
+      description: 'Edita la publicación y asocia su política de cancelación. Si se editan título, descripción, ubicación
+        o tipo de una publicación ACTIVA pasa a PENDIENTE_REVISION.
+
+
+        **Rol:** Anfitrión propietario o Administrador. **Historia:** HU-006, HU-023.'
+      operationId: editarPublicacion
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlojamientoRequest'
+  /api/accommodations/{id}/status:
+    patch:
+      tags:
+      - S2 Alojamientos
+      summary: Cambiar estado de la publicación
+      description: 'Activa (requiere información mínima, RN-16) o pausa la publicación respetando las transiciones de la página
+        06.
+
+
+        **Rol:** Anfitrión propietario o Administrador. **Historia:** HU-007.'
+      operationId: cambiarEstadoPublicacion
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoPublicacionRequest'
+  /api/accommodations/{id}/pricing:
+    put:
+      tags:
+      - S2 Alojamientos
+      summary: Configurar tarifas y servicios adicionales
+      description: 'Tarifa de limpieza, descuento por estancia larga y servicios adicionales con costo.
+
+
+        **Rol:** Anfitrión propietario. **Historia:** HU-024.'
+      operationId: configurarTarifas
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarifasRequest'
+  /api/cancellation-policies:
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Listar políticas de cancelación
+      description: 'FLEXIBLE, MODERADA y ESTRICTA con su condición de devolución.
+
+
+        **Rol:** Autenticado. **Historia:** HU-023.'
+      operationId: listarPoliticas
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PoliticaCancelacion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/admin/settings/service-fee:
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Consultar tarifa de servicio
+      description: 'Porcentaje vigente de la tarifa de servicio (10 % por defecto).
+
+
+        **Rol:** Administrador. **Historia:** HU-024.'
+      operationId: consultarTarifaServicio
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarifaServicio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags:
+      - S2 Alojamientos
+      summary: Actualizar tarifa de servicio
+      description: 'Cambia el porcentaje; aplica a las nuevas cotizaciones (RN-17).
+
+
+        **Rol:** Administrador. **Historia:** HU-024.'
+      operationId: actualizarTarifaServicio
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarifaServicio'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarifaServicio'
+  /api/availability/{accommodationId}:
+    get:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Consultar calendario
+      description: 'Periodos disponibles, no disponibles y reservados (PENDIENTE_PAGO o CONFIRMADA).
+
+
+        **Rol:** Público. **Historia:** HU-008.'
+      operationId: consultarCalendario
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Periodo'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/accommodationId'
+      security: []
+    put:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Registrar o modificar periodos
+      description: 'Valida fechas (salida > llegada, no en el pasado) y rechaza cambios que choquen con reservas CONFIRMADAS
+        (RN-06).
+
+
+        **Rol:** Anfitrión propietario. **Historia:** HU-008.'
+      operationId: actualizarCalendario
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Periodo'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      parameters:
+      - $ref: '#/components/parameters/accommodationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/PeriodoRequest'
+  /api/quotes:
+    post:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Cotizar estancia
+      description: 'Calcula el total con la fórmula de la página 06; vigencia de 30 minutos (RN-08).
+
+
+        **Rol:** Huésped. **Historia:** HU-011.'
+      operationId: cotizarEstancia
+      responses:
+        '201':
+          description: Cotización generada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cotizacion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CotizacionRequest'
+  /api/bookings:
+    post:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Crear reserva inmediata
+      description: 'Revalida disponibilidad, crea la reserva en PENDIENTE_PAGO y retiene el periodo 15 minutos. Idempotente:
+        un reintento con la misma llave devuelve la reserva existente (RN-12).
+
+
+        **Rol:** Huésped. **Historia:** HU-012.'
+      operationId: crearReserva
+      responses:
+        '201':
+          description: Reserva creada en PENDIENTE_PAGO
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reserva'
+        '200':
+          description: Reserva ya existente (reintento idempotente)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reserva'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservaRequest'
+    get:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Mis reservas
+      description: 'Reservas del huésped autenticado, de la más reciente a la más antigua.
+
+
+        **Rol:** Huésped. **Historia:** HU-014.'
+      operationId: listarMisReservas
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaReservas'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - name: estado
+        in: query
+        schema:
+          $ref: '#/components/schemas/EstadoReserva'
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+  /api/bookings/received:
+    get:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Reservas recibidas
+      description: 'Reservas de las publicaciones del anfitrión autenticado.
+
+
+        **Rol:** Anfitrión. **Historia:** HU-014.'
+      operationId: listarReservasRecibidas
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaReservas'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+  /api/bookings/{id}:
+    get:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Detalle e historial de una reserva
+      description: 'Incluye estado, política aplicada, devolución si aplica e historial de cambios.
+
+
+        **Rol:** Huésped o Anfitrión (solo las propias). **Historia:** HU-014.'
+      operationId: consultarReserva
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reserva'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+  /api/bookings/{id}/cancel:
+    post:
+      tags:
+      - S3 Reservas y Disponibilidad
+      summary: Cancelar reserva
+      description: 'Aplica la política guardada en la reserva, calcula la devolución simulada, pasa a CANCELADA y libera el
+        periodo. Idempotente.
+
+
+        **Rol:** Huésped. **Historia:** HU-015.'
+      operationId: cancelarReserva
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cancelacion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelacionRequest'
+  /api/payments:
+    post:
+      tags:
+      - S4 Pagos
+      summary: Pagar reserva (simulado)
+      description: 'Cobra con Stripe en modo prueba. Aprobado: la reserva pasa a CONFIRMADA. Rechazado: RECHAZADA y periodo
+        liberado (RN-10). Idempotente.
+
+
+        **Rol:** Huésped. **Historia:** HU-013.'
+      operationId: pagarReserva
+      responses:
+        '201':
+          description: Pago procesado (aprobado o rechazado)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pago'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PagoRequest'
+  /api/notifications:
+    get:
+      tags:
+      - S5 Notificaciones y Reseñas
+      summary: Mis notificaciones
+      description: 'Solo las del usuario autenticado, con el contador de no leídas.
+
+
+        **Rol:** Autenticado. **Historia:** HU-016.'
+      operationId: listarNotificaciones
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaNotificaciones'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+  /api/notifications/{id}/read:
+    patch:
+      tags:
+      - S5 Notificaciones y Reseñas
+      summary: Marcar notificación como leída
+      description: 'Marca como leída y actualiza el contador.
+
+
+        **Rol:** Autenticado. **Historia:** HU-016.'
+      operationId: marcarLeida
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notificacion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+  /api/reviews:
+    post:
+      tags:
+      - S5 Notificaciones y Reseñas
+      summary: Registrar reseña
+      description: 'Solo el huésped de una reserva COMPLETADA y sin reseña previa (RN-13). Calificación de 1 a 5.
+
+
+        **Rol:** Huésped. **Historia:** HU-017.'
+      operationId: registrarResena
+      responses:
+        '201':
+          description: Reseña registrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resena'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResenaRequest'
+    get:
+      tags:
+      - S5 Notificaciones y Reseñas
+      summary: Reseñas de una publicación
+      description: 'Reseñas visibles y calificación promedio (las ocultas no se muestran, RN-20).
+
+
+        **Rol:** Público. **Historia:** HU-010, HU-017.'
+      operationId: listarResenas
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaResenas'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      parameters:
+      - name: accommodationId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security: []
+  /api/admin/accommodations:
+    get:
+      tags:
+      - S6 Administración y Reportes
+      summary: Listar publicaciones para moderación
+      description: 'Todas las publicaciones con filtro por estado.
+
+
+        **Rol:** Administrador. **Historia:** HU-018.'
+      operationId: listarParaModeracion
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alojamiento'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: estado
+        in: query
+        schema:
+          $ref: '#/components/schemas/EstadoPublicacion'
+  /api/admin/bookings/manual-review:
+    get:
+      tags:
+      - S6 Administración y Reportes
+      summary: Reservas en revisión manual
+      description: 'Reservas futuras de publicaciones bloqueadas, marcadas para revisión manual.
+
+
+        **Rol:** Administrador. **Historia:** HU-018.'
+      operationId: listarRevisionManual
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reserva'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/admin/audit:
+    get:
+      tags:
+      - S6 Administración y Reportes
+      summary: Consultar auditoría
+      description: 'Eventos en solo lectura, del más reciente al más antiguo.
+
+
+        **Rol:** Administrador. **Historia:** HU-019.'
+      operationId: consultarAuditoria
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginaAuditoria'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: usuario
+        in: query
+        schema:
+          type: string
+      - name: entidad
+        in: query
+        schema:
+          type: string
+      - name: accion
+        in: query
+        schema:
+          type: string
+      - name: desde
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: hasta
+        in: query
+        schema:
+          type: string
+          format: date
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+  /api/admin/reviews/{id}/visibility:
+    patch:
+      tags:
+      - S6 Administración y Reportes
+      summary: Ocultar o restablecer reseña
+      description: 'La reseña oculta se conserva y deja de contar en el promedio (RN-20).
+
+
+        **Rol:** Administrador. **Historia:** HU-025.'
+      operationId: cambiarVisibilidadResena
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resena'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisibilidadRequest'
+  /api/admin/dashboard:
+    get:
+      tags:
+      - S6 Administración y Reportes
+      summary: Dashboard
+      description: 'Usuarios, publicaciones ACTIVAS, reservas por estado, ingresos estimados (CONFIRMADAS y COMPLETADAS, D-16)
+        y ciudades con mayor demanda.
+
+
+        **Rol:** Administrador. **Historia:** HU-020.'
+      operationId: consultarDashboard
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/admin/reports/export:
+    post:
+      tags:
+      - S6 Administración y Reportes
+      summary: Exportar reporte
+      description: 'Genera el archivo PDF o Excel con los datos vigentes y registra quién lo solicitó y cuándo (RN-21).
+
+
+        **Rol:** Administrador. **Historia:** HU-021.'
+      operationId: exportarReporte
+      responses:
+        '200':
+          description: Archivo generado
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReporteRequest'
+  /api/admin/accommodations/{id}/moderation:
+    patch:
+      tags:
+      - S6 Administración y Reportes
+      summary: Moderar publicación (aprobar, pausar, bloquear, desbloquear)
+      description: 'Aprobar, pausar o bloquear (motivo obligatorio). Al bloquear, las reservas futuras se marcan para revisión
+        manual (RN-19). Notifica al anfitrión y registra auditoría.
+
+
+        **Rol:** Administrador. **Historia:** HU-018.'
+      operationId: moderarPublicacion
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeracionRequest'
+  /api/admin/bookings/{id}/manual-review:
+    patch:
+      tags:
+      - S6 Administración y Reportes
+      summary: Cerrar revisión manual de una reserva
+      description: 'Registra la decisión del administrador sobre una reserva futura de una publicación bloqueada (RN-19).
+
+
+        **Rol:** Administrador. **Historia:** HU-018.'
+      operationId: cerrarRevisionManual
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  description: Decisión tomada por el administrador (texto libre)
+      responses:
+        '200':
+          description: Revisión cerrada
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/admin/reviews:
+    get:
+      tags:
+      - S5 Notificaciones y Reseñas
+      summary: Listar reseñas para moderar
+      description: '**Rol:** Administrador. **Historia:** HU-025.'
+      operationId: listarResenasAdmin
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Reseñas, incluidas las ocultas
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/accommodations/mine/{id}:
+    get:
+      tags:
+      - S2 Alojamientos
+      summary: Consultar una publicación propia para editarla
+      description: '**Rol:** Anfitrión propietario. **Historia:** HU-006.'
+      operationId: consultarPublicacionPropia
+      parameters:
+      - $ref: '#/components/parameters/idPath'
+      responses:
+        '200':
+          description: Operación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alojamiento'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    idPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    accommodationId:
+      name: accommodationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Llave única por operación para tolerar reintentos (RN-12)
+      schema:
+        type: string
+        format: uuid
+    page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    size:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    BadRequest:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Sin sesión o token inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: El rol o la propiedad del recurso no autorizan la operación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflicto de estado (solapamiento, transición no permitida o duplicado)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unprocessable:
+      description: Regla de negocio incumplida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Rol:
+      type: string
+      enum:
+      - HUESPED
+      - ANFITRION
+      - ADMINISTRADOR
+    EstadoCuenta:
+      type: string
+      enum:
+      - ACTIVA
+      - DESACTIVADA
+      - RESTRINGIDA
+    EstadoPublicacion:
+      type: string
+      enum:
+      - BORRADOR
+      - PENDIENTE_REVISION
+      - ACTIVA
+      - PAUSADA
+      - BLOQUEADA
+    EstadoReserva:
+      type: string
+      enum:
+      - PENDIENTE_PAGO
+      - CONFIRMADA
+      - RECHAZADA
+      - CANCELADA
+      - COMPLETADA
+    TipoPolitica:
+      type: string
+      enum:
+      - FLEXIBLE
+      - MODERADA
+      - ESTRICTA
+    Error:
+      type: object
+      required:
+      - codigo
+      - mensaje
+      properties:
+        codigo:
+          type: string
+          example: RESERVA_SOLAPADA
+        mensaje:
+          type: string
+          example: Las fechas seleccionadas ya no están disponibles
+        detalles:
+          type: array
+          items:
+            type: string
+    Mensaje:
+      type: object
+      properties:
+        mensaje:
+          type: string
+    RegistroRequest:
+      type: object
+      required:
+      - nombre
+      - correo
+      - contrasena
+      - rol
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+        contrasena:
+          type: string
+          format: password
+          minLength: 8
+        rol:
+          type: string
+          enum:
+          - HUESPED
+          - ANFITRION
+    LoginRequest:
+      type: object
+      required:
+      - correo
+      - contrasena
+      properties:
+        correo:
+          type: string
+          format: email
+        contrasena:
+          type: string
+          format: password
+    SesionResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        expiraEn:
+          type: string
+          format: date-time
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+    RecuperacionRequest:
+      type: object
+      required:
+      - correo
+      properties:
+        correo:
+          type: string
+          format: email
+    RestablecerRequest:
+      type: object
+      required:
+      - token
+      - nuevaContrasena
+      properties:
+        token:
+          type: string
+        nuevaContrasena:
+          type: string
+          format: password
+          minLength: 8
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+        rol:
+          $ref: '#/components/schemas/Rol'
+        estado:
+          $ref: '#/components/schemas/EstadoCuenta'
+        telefono:
+          type: string
+          nullable: true
+        documento:
+          type: string
+          nullable: true
+        pais:
+          type: string
+          nullable: true
+        fotoUrl:
+          type: string
+          nullable: true
+        fechaRegistro:
+          type: string
+          format: date-time
+    PerfilRequest:
+      type: object
+      properties:
+        nombre:
+          type: string
+        telefono:
+          type: string
+        documento:
+          type: string
+        pais:
+          type: string
+        fotoUrl:
+          type: string
+    EstadoCuentaRequest:
+      type: object
+      required:
+      - accion
+      properties:
+        accion:
+          type: string
+          enum:
+          - DESACTIVAR
+          - REACTIVAR
+    RestriccionRequest:
+      type: object
+      required:
+      - estado
+      properties:
+        estado:
+          type: string
+          enum:
+          - RESTRINGIDO
+          - ACTIVO
+        motivo:
+          type: string
+          description: Obligatorio para RESTRINGIDO
+    PaginaUsuarios:
+      type: object
+      properties:
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usuario'
+        pagina:
+          type: integer
+        total:
+          type: integer
+    ServicioAdicional:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        costo:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        activo:
+          type: boolean
+    PoliticaCancelacion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          $ref: '#/components/schemas/TipoPolitica'
+        diasAntelacion:
+          type: integer
+        porcentajeDevolucion:
+          type: number
+    Alojamiento:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        idAnfitrion:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        ciudad:
+          type: string
+        direccion:
+          type: string
+        capacidad:
+          type: integer
+          minimum: 1
+        precioPorNoche:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+          exclusiveMinimum: true
+        servicios:
+          type: array
+          items:
+            type: string
+        reglas:
+          type: string
+        imagenes:
+          type: array
+          items:
+            type: string
+        estado:
+          $ref: '#/components/schemas/EstadoPublicacion'
+        politicaCancelacion:
+          $ref: '#/components/schemas/PoliticaCancelacion'
+        tarifaLimpieza:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        descuentoPct:
+          type: number
+          minimum: 0
+          maximum: 100
+        descuentoMinNoches:
+          type: integer
+          minimum: 0
+        serviciosAdicionales:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicioAdicional'
+        calificacionPromedio:
+          type: number
+          nullable: true
+    AlojamientoRequest:
+      type: object
+      required:
+      - titulo
+      properties:
+        titulo:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        ciudad:
+          type: string
+        direccion:
+          type: string
+        capacidad:
+          type: integer
+          minimum: 1
+        precioPorNoche:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+          exclusiveMinimum: true
+        servicios:
+          type: array
+          items:
+            type: string
+        reglas:
+          type: string
+        imagenes:
+          type: array
+          items:
+            type: string
+        idPoliticaCancelacion:
+          type: string
+          format: uuid
+    EstadoPublicacionRequest:
+      type: object
+      required:
+      - estado
+      properties:
+        estado:
+          type: string
+          enum:
+          - ACTIVA
+          - PAUSADA
+    TarifasRequest:
+      type: object
+      properties:
+        tarifaLimpieza:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        descuentoPct:
+          type: number
+          minimum: 0
+          maximum: 100
+        descuentoMinNoches:
+          type: integer
+          minimum: 0
+        serviciosAdicionales:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicioAdicional'
+    TarifaServicio:
+      type: object
+      required:
+      - porcentaje
+      properties:
+        porcentaje:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 10
+    ResultadoBusqueda:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        titulo:
+          type: string
+        imagen:
+          type: string
+        ciudad:
+          type: string
+        tipo:
+          type: string
+        capacidad:
+          type: integer
+        precioPorNoche:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+    PaginaResultados:
+      type: object
+      properties:
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultadoBusqueda'
+        pagina:
+          type: integer
+        total:
+          type: integer
+    Periodo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        fechaInicio:
+          type: string
+          format: date
+        fechaFin:
+          type: string
+          format: date
+        tipo:
+          type: string
+          enum:
+          - DISPONIBLE
+          - NO_DISPONIBLE
+          - RESERVADO
+    PeriodoRequest:
+      type: object
+      required:
+      - fechaInicio
+      - fechaFin
+      - tipo
+      properties:
+        fechaInicio:
+          type: string
+          format: date
+        fechaFin:
+          type: string
+          format: date
+        tipo:
+          type: string
+          enum:
+          - DISPONIBLE
+          - NO_DISPONIBLE
+    CotizacionRequest:
+      type: object
+      required:
+      - idAlojamiento
+      - fechaLlegada
+      - fechaSalida
+      - huespedes
+      properties:
+        idAlojamiento:
+          type: string
+          format: uuid
+        fechaLlegada:
+          type: string
+          format: date
+        fechaSalida:
+          type: string
+          format: date
+        huespedes:
+          type: integer
+          minimum: 1
+        serviciosAdicionales:
+          type: array
+          items:
+            type: integer
+            format: int64
+    Cotizacion:
+      type: object
+      properties:
+        id:
+          type: string
+        noches:
+          type: integer
+        precioBase:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        descuento:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        tarifaLimpieza:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        tarifaServicio:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        serviciosAdicionales:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServicioAdicional'
+        total:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        validaHasta:
+          type: string
+          format: date-time
+    ReservaRequest:
+      type: object
+      required:
+      - idCotizacion
+      properties:
+        idCotizacion:
+          type: string
+    Reserva:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        idHuesped:
+          type: string
+          format: uuid
+        idAlojamiento:
+          type: string
+          format: uuid
+        fechaLlegada:
+          type: string
+          format: date
+        fechaSalida:
+          type: string
+          format: date
+        huespedes:
+          type: integer
+        estado:
+          $ref: '#/components/schemas/EstadoReserva'
+        total:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        desglose:
+          $ref: '#/components/schemas/Cotizacion'
+        politicaAplicada:
+          $ref: '#/components/schemas/PoliticaCancelacion'
+        revisionManual:
+          type: boolean
+        expiraEn:
+          type: string
+          format: date-time
+          nullable: true
+        historial:
+          type: array
+          items:
+            type: object
+            properties:
+              estado:
+                $ref: '#/components/schemas/EstadoReserva'
+              fecha:
+                type: string
+                format: date-time
+    PaginaReservas:
+      type: object
+      properties:
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reserva'
+        pagina:
+          type: integer
+        total:
+          type: integer
+    CancelacionRequest:
+      type: object
+      required:
+      - motivo
+      properties:
+        motivo:
+          type: string
+    Cancelacion:
+      type: object
+      properties:
+        idReserva:
+          type: string
+          format: uuid
+        motivo:
+          type: string
+        montoDevolucion:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        estadoFinal:
+          $ref: '#/components/schemas/EstadoReserva'
+        fecha:
+          type: string
+          format: date-time
+    PagoRequest:
+      type: object
+      required:
+      - idReserva
+      - metodoPagoPrueba
+      properties:
+        idReserva:
+          type: string
+          format: uuid
+        metodoPagoPrueba:
+          type: string
+          description: Identificador del método de pago de prueba de Stripe
+          example: pm_card_visa
+    Pago:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        idReserva:
+          type: string
+          format: uuid
+        idOperacionExterna:
+          type: string
+        monto:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        estado:
+          type: string
+          enum:
+          - APROBADO
+          - RECHAZADO
+        fecha:
+          type: string
+          format: date-time
+    Notificacion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        tipo:
+          type: string
+        mensaje:
+          type: string
+        leida:
+          type: boolean
+        fecha:
+          type: string
+          format: date-time
+        idReserva:
+          type: string
+          format: uuid
+        idAlojamiento:
+          type: string
+          format: uuid
+    ListaNotificaciones:
+      type: object
+      properties:
+        noLeidas:
+          type: integer
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notificacion'
+    ResenaRequest:
+      type: object
+      required:
+      - idReserva
+      - calificacion
+      - comentario
+      properties:
+        idReserva:
+          type: string
+          format: uuid
+        calificacion:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comentario:
+          type: string
+          minLength: 1
+    Resena:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        idReserva:
+          type: string
+          format: uuid
+        idAlojamiento:
+          type: string
+          format: uuid
+        idHuesped:
+          type: string
+          format: uuid
+        calificacion:
+          type: integer
+        comentario:
+          type: string
+        visible:
+          type: boolean
+        fecha:
+          type: string
+          format: date-time
+    ListaResenas:
+      type: object
+      properties:
+        promedio:
+          type: number
+          nullable: true
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resena'
+    ModeracionRequest:
+      type: object
+      required:
+      - accion
+      properties:
+        accion:
+          type: string
+          enum:
+          - APROBAR
+          - PAUSAR
+          - BLOQUEAR
+          - DESBLOQUEAR
+        motivo:
+          type: string
+          description: Obligatorio para BLOQUEAR
+    VisibilidadRequest:
+      type: object
+      required:
+      - visible
+      - motivo
+      properties:
+        visible:
+          type: boolean
+        motivo:
+          type: string
+    EventoAuditoria:
+      type: object
+      required:
+      - usuario
+      - entidad
+      - idEntidad
+      - accion
+      - resultado
+      properties:
+        id:
+          type: string
+          format: uuid
+        usuario:
+          type: string
+        entidad:
+          type: string
+        idEntidad:
+          type: string
+        accion:
+          type: string
+        resultado:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+    PaginaAuditoria:
+      type: object
+      properties:
+        contenido:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventoAuditoria'
+        pagina:
+          type: integer
+        total:
+          type: integer
+    Dashboard:
+      type: object
+      properties:
+        usuarios:
+          type: integer
+        publicacionesActivas:
+          type: integer
+        reservasPorEstado:
+          type: object
+          additionalProperties:
+            type: integer
+        ingresosEstimados:
+          type: number
+          format: double
+          minimum: 0
+          description: Monto con dos decimales
+        ciudadesMayorDemanda:
+          type: array
+          items:
+            type: object
+            properties:
+              ciudad:
+                type: string
+              reservas:
+                type: integer
+    ReporteRequest:
+      type: object
+      required:
+      - tipo
+      - formato
+      properties:
+        tipo:
+          type: string
+          enum:
+          - USUARIOS
+          - PUBLICACIONES
+          - RESERVAS
+          - INGRESOS
+          - DEMANDA
+        formato:
+          type: string
+          enum:
+          - PDF
+          - EXCEL
