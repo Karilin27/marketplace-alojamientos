@@ -57,6 +57,30 @@
     return String(texto || '').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
   }
 
-  var api = { SERVICIOS: SERVICIOS, validarFiltros: validarFiltros, validarPublicacion: validarPublicacion, validarTarifas: validarTarifas, lineas: lineas };
+  /* D-21 — Subida de fotos desde el computador (mismas reglas que ReglasImagen en el backend). */
+  var MAX_IMAGENES = 10;
+  var MAX_BYTES_IMAGEN = 5 * 1024 * 1024;
+  var TIPOS_IMAGEN = ['image/jpeg', 'image/png', 'image/webp'];
+
+  /** Devuelve el error de un archivo elegido ('' si se puede subir). */
+  function validarArchivoImagen(archivo) {
+    if (!archivo) return 'Selecciona una imagen.';
+    if (TIPOS_IMAGEN.indexOf(String(archivo.type || '').toLowerCase()) < 0) return '«' + archivo.name + '» no es JPG, PNG ni WEBP.';
+    if (archivo.size > MAX_BYTES_IMAGEN) return '«' + archivo.name + '» pesa más de 5 MB.';
+    return '';
+  }
+
+  /** Cuántas imágenes más caben, según las URL que ya hay en el campo. */
+  function cupoImagenes(texto) { return Math.max(0, MAX_IMAGENES - lineas(texto).length); }
+
+  /** Agrega una URL al final del campo de imágenes (una por línea), sin repetirla. */
+  function agregarUrl(texto, url) {
+    var actuales = lineas(texto);
+    if (actuales.indexOf(url) < 0) actuales.push(url);
+    return actuales.join('\n');
+  }
+
+  var api = { SERVICIOS: SERVICIOS, validarFiltros: validarFiltros, validarPublicacion: validarPublicacion, validarTarifas: validarTarifas, lineas: lineas,
+    MAX_IMAGENES: MAX_IMAGENES, MAX_BYTES_IMAGEN: MAX_BYTES_IMAGEN, validarArchivoImagen: validarArchivoImagen, cupoImagenes: cupoImagenes, agregarUrl: agregarUrl };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else raiz.AlojamientosLogica = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -41,6 +41,7 @@
   function llenar(a) {
     ['titulo', 'descripcion', 'tipo', 'ciudad', 'direccion', 'capacidad', 'precioPorNoche', 'reglas'].forEach(function (c) { $(c).value = a[c] == null ? '' : a[c]; });
     $('imagenes').value = (a.imagenes || []).join('\n');
+    pintarFotos();
     $('politica').value = a.politicaCancelacion ? a.politicaCancelacion.id : '';
     [].slice.call(document.querySelectorAll('#servicios input')).forEach(function (c) {
       c.checked = (a.servicios || []).some(function (s) { return s.toLowerCase() === c.value.toLowerCase(); });
@@ -52,6 +53,46 @@
     }
     mostrarTarifas(a);
   }
+
+  // ---------------------------------------------------------------- D-21: fotos desde el computador
+  function pintarFotos() {
+    var c = $('vista-fotos'); c.textContent = '';
+    L.lineas($('imagenes').value).filter(function (u) { return /^https?:\/\//i.test(u); }).forEach(function (u, i) {
+      c.appendChild(el('img', { src: u, alt: 'Foto ' + (i + 1) + ' de la publicación', loading: 'lazy' }));
+    });
+  }
+  $('imagenes').addEventListener('input', pintarFotos);
+
+  $('archivos').addEventListener('change', async function () {
+    var archivos = [].slice.call($('archivos').files || []);
+    $('archivos').value = '';
+    if (!archivos.length) return;
+    $('e-imagenes').textContent = '';
+    var errores = [], subidas = 0;
+    var cupo = L.cupoImagenes($('imagenes').value);
+    if (archivos.length > cupo) {
+      errores.push('Solo caben ' + cupo + ' foto(s) más (máximo ' + L.MAX_IMAGENES + ').');
+      archivos = archivos.slice(0, cupo);
+    }
+    for (var i = 0; i < archivos.length; i++) {
+      var f = archivos[i];
+      var error = L.validarArchivoImagen(f);
+      if (error) { errores.push(error); continue; }
+      $('estado-fotos').textContent = 'Subiendo ' + (i + 1) + ' de ' + archivos.length + ': ' + f.name + '…';
+      try {
+        var r = await A.subirImagen(f);
+        $('imagenes').value = L.agregarUrl($('imagenes').value, r.url);
+        subidas++;
+        pintarFotos();
+      } catch (e) {
+        errores.push('«' + f.name + '»: ' + e.mensaje);
+      }
+    }
+    $('estado-fotos').textContent = subidas
+      ? subidas + (subidas === 1 ? ' foto subida.' : ' fotos subidas.') + ' Recuerda guardar la publicación.'
+      : '';
+    $('e-imagenes').textContent = errores.join(' ');
+  });
 
   async function iniciar() {
     try {

@@ -7,10 +7,10 @@ Historias: **HU-005** (SCRUM-18), **HU-006** (SCRUM-19), **HU-007** (SCRUM-20), 
 | Capa | Archivos |
 |---|---|
 | Base de datos | `database/migrations/V5__catalogo_ajustes.sql` (y su reversión en `rollback/V5__rollback.sql`). Se aplica después de V1 a V4 |
-| Backend (Java) | Paquete `edu.unbosque.marketplace.alojamientos`: `ReglasAlojamiento` (reglas puras), `AlojamientoRepositorio` (SQL), `PublicacionService`, `EstadoPublicacionService`, `TarifasService`, `BusquedaService`, `AlojamientoController`, `TarifasController` |
+| Backend (Java) | Paquete `edu.unbosque.marketplace.alojamientos`: `ReglasAlojamiento` (reglas puras), `AlojamientoRepositorio` (SQL), `PublicacionService`, `EstadoPublicacionService`, `TarifasService`, `BusquedaService`, `AlojamientoController`, `TarifasController`. Subida de fotos (D-21): `ReglasImagen`, `AlmacenImagenes`, `AlmacenSupabase`, `ImagenService`, `ImagenController` |
 | Seguridad | `FiltroAutenticacion`: quedan públicas `GET /api/accommodations`, `GET /api/accommodations/{id}` y `GET /api/cancellation-policies` |
 | Frontend | `frontend/pages/alojamientos/` (`buscar`, `detalle`, `publicar`, `mis-publicaciones`), `frontend/js/alojamientos/`, `frontend/css/alojamientos.css` |
-| Pruebas | `ReglasAlojamientoTest` (JUnit), `frontend/test/alojamientos.test.js` (Node), `frontend/test/e2e/e2e-alojamientos.js` (Playwright), `api/S2-alojamientos.postman_collection.json` (Newman, 28 peticiones) |
+| Pruebas | `ReglasAlojamientoTest`, `ReglasImagenTest`, `ImagenServiceTest` y `AlmacenSupabaseTest` (JUnit), `frontend/test/alojamientos.test.js` (Node), `frontend/test/e2e/e2e-alojamientos.js` (Playwright), `api/S2-alojamientos.postman_collection.json` (Newman, 28 peticiones) |
 
 ## Endpoints
 
@@ -18,6 +18,7 @@ Historias: **HU-005** (SCRUM-18), **HU-006** (SCRUM-19), **HU-007** (SCRUM-20), 
 |---|---|---|
 | `GET /api/cancellation-policies` | HU-023 CA-01 | Público |
 | `POST /api/accommodations` | HU-005 | Anfitrión |
+| `POST /api/accommodations/images` (multipart, campo `archivo`) → `{url, bytes, tipo}` | HU-005 CA-03 y HU-006 (cambio D-21) | Anfitrión |
 | `GET /api/accommodations/mine` · `GET /api/accommodations/mine/{id}` | HU-007 CA-09 | Anfitrión dueño (o administrador) |
 | `PUT /api/accommodations/{id}` | HU-006 (y HU-023 CA-02 con `idPoliticaCancelacion`) | Anfitrión dueño o administrador |
 | `PATCH /api/accommodations/{id}/status` | HU-007 | Anfitrión dueño |
@@ -26,7 +27,7 @@ Historias: **HU-005** (SCRUM-18), **HU-006** (SCRUM-19), **HU-007** (SCRUM-20), 
 | `GET /api/accommodations?ciudad=&llegada=&salida=&huespedes=&tipo=&precioMin=&precioMax=&servicios=&page=&size=` | HU-009 | Público |
 | `GET /api/accommodations/{id}` | HU-010 (solo ACTIVAS) | Público |
 
-Errores con el formato común `{codigo, mensaje, detalles}`: 400 datos inválidos, 403 no es el dueño o el rol no corresponde, 404 no existe o no está activa, 422 regla de negocio (información incompleta, transición no permitida, publicación bloqueada).
+Errores con el formato común `{codigo, mensaje, detalles}`: 400 datos inválidos, 403 no es el dueño o el rol no corresponde, 404 no existe o no está activa, 413 imagen de más de 5 MB, 422 regla de negocio (información incompleta, transición no permitida, publicación bloqueada) y 503 subida de fotos no configurada o almacenamiento no disponible.
 
 ## Reglas que se implementan
 
@@ -56,6 +57,20 @@ npx newman run api/S2-alojamientos.postman_collection.json --env-var baseUrl=htt
 node --test frontend/test/alojamientos.test.js
 node frontend/test/e2e/e2e-alojamientos.js        # requiere playwright; usa una API simulada
 ```
+
+## Cambio D-21: subir fotos desde el computador (14 de noviembre de 2026)
+
+**Antes:** el anfitrión solo podía pegar URL de imágenes ya publicadas en internet. **Ahora:** en *Publicar* hay un botón «Subir fotos desde tu computador»; cada foto se sube a Supabase Storage y su URL pública se agrega sola al campo de imágenes. Pegar URL sigue funcionando igual.
+
+- **Motivo:** los anfitriones no tienen dónde alojar sus fotos; pedirles una URL era una barrera para publicar (observado al cargar datos reales para la demo).
+- **Alcance:** cumple igual HU-005 CA-03 («rutas o referencias de imágenes»): en la base se sigue guardando la URL, así que no hay migración ni cambios en `catalogo.foto_alojamiento`.
+- **Reglas:** solo anfitrión (403 en otro caso); JPG, PNG o WEBP detectados por el contenido del archivo, no por el nombre; máximo 5 MB por foto (413); máximo 10 imágenes por publicación (como antes). Cada archivo se guarda como `alojamientos/<id-anfitrión>/<uuid>.<ext>`.
+- **Seguridad:** la llave `service_role` de Supabase vive solo en Render (`SUPABASE_SERVICE_KEY`); el navegador nunca la ve. Si la variable no está, el endpoint responde 503 y la página sugiere pegar la URL.
+- **Configuración (una sola vez):**
+  1. Supabase → Storage → *New bucket* `alojamientos`, marcado como **Public bucket**.
+  2. Supabase → Project Settings → API: copiar la *Project URL* y la llave **service_role**.
+  3. Render → servicio `marketplace-alojamientos-api` → Environment: `SUPABASE_URL` = Project URL, `SUPABASE_SERVICE_KEY` = llave service_role, `SUPABASE_BUCKET` = `alojamientos` (ya viene en `render.yaml`). Guardar y redesplegar.
+- **Cómo probar:** entrar como anfitrión → Publicar → «Subir fotos desde tu computador» → elegir una foto JPG de menos de 5 MB → la URL aparece en el campo y se ve la miniatura → Guardar. Negativos: un PDF o GIF (400 `FORMATO_NO_PERMITIDO`), una foto de más de 5 MB (413 `IMAGEN_MUY_GRANDE`), un huésped que llama al endpoint (403).
 
 ## Pendiente de confirmar con el equipo
 

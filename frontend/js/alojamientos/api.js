@@ -41,6 +41,30 @@
     return datos;
   }
 
+  /** D-21: sube una foto (multipart, campo "archivo"). El navegador pone el Content-Type con su boundary. */
+  async function subirImagen(archivo) {
+    var datos = new FormData();
+    datos.append('archivo', archivo);
+    var h = { Accept: 'application/json' };
+    var t = token();
+    if (t) h.Authorization = 'Bearer ' + t;
+    var resp;
+    try {
+      resp = await fetch(base() + '/api/accommodations/images', { method: 'POST', headers: h, body: datos });
+    } catch (e) {
+      throw { status: 0, mensaje: mensajeError(null, 0) };
+    }
+    var cuerpo = null;
+    try { cuerpo = await resp.json(); } catch (e) { /* sin cuerpo */ }
+    if (resp.status === 401) {
+      try { localStorage.removeItem(TOKEN_KEY); } catch (e) { /* ignorar */ }
+      window.location.href = LOGIN_URL + '?volver=' + encodeURIComponent(window.location.pathname + window.location.search);
+      throw { status: 401, mensaje: 'Tu sesión venció. Inicia sesión de nuevo.' };
+    }
+    if (!resp.ok) throw { status: resp.status, codigo: cuerpo && cuerpo.codigo, mensaje: mensajeError(cuerpo, resp.status) };
+    return cuerpo;
+  }
+
   window.AlojamientosApi = {
     usuario: usuario,
     haySesion: function () { return !!token(); },
@@ -59,6 +83,7 @@
     mia: function (id) { return llamar('GET', '/api/accommodations/mine/' + encodeURIComponent(id)); },
     cambiarEstado: function (id, estado) { return llamar('PATCH', '/api/accommodations/' + encodeURIComponent(id) + '/status', { estado: estado }); },
     tarifas: function (id, cuerpo) { return llamar('PUT', '/api/accommodations/' + encodeURIComponent(id) + '/pricing', cuerpo); },
+    subirImagen: subirImagen,                                                             // D-21
     // HU-017 y HU-025 (S5 reseñas)
     resenas: function (idAlojamiento) { return llamar('GET', '/api/reviews?accommodationId=' + encodeURIComponent(idAlojamiento), undefined, false); },
     resenar: function (cuerpo) { return llamar('POST', '/api/reviews', cuerpo); },

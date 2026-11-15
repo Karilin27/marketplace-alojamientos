@@ -10,7 +10,8 @@ public class ReglaNegocioException extends RuntimeException {
 
     public enum Tipo {
         SOLICITUD_INVALIDA(400), NO_AUTENTICADO(401), PROHIBIDO(403),
-        NO_ENCONTRADO(404), CONFLICTO(409), REGLA_NEGOCIO(422);
+        NO_ENCONTRADO(404), CONFLICTO(409), CARGA_DEMASIADO_GRANDE(413), REGLA_NEGOCIO(422),
+        SERVICIO_NO_DISPONIBLE(503);
 
         private final int http;
 
@@ -52,6 +53,14 @@ public class ReglaNegocioException extends RuntimeException {
 
     public static ReglaNegocioException noEncontrado(String mensaje) {
         return new ReglaNegocioException(Tipo.NO_ENCONTRADO, "NO_ENCONTRADO", mensaje, List.of());
+    }
+
+    public static ReglaNegocioException demasiadoGrande(String codigo, String mensaje, String... detalles) {
+        return new ReglaNegocioException(Tipo.CARGA_DEMASIADO_GRANDE, codigo, mensaje, List.of(detalles));
+    }
+
+    public static ReglaNegocioException noDisponible(String codigo, String mensaje) {
+        return new ReglaNegocioException(Tipo.SERVICIO_NO_DISPONIBLE, codigo, mensaje, List.of());
     }
 
     public String codigo() { return codigo; }

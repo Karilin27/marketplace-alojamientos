@@ -24,3 +24,9 @@ services:
         value: simulada
       - key: CORS_ORIGENES
         sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: alojamientos

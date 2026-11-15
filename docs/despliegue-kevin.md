@@ -10,6 +10,9 @@
 | `PASARELA` | `simulada` o `stripe` | Stripe solo con claves de prueba |
 | `STRIPE_API_KEY` | `sk_test_...` | Solo si `PASARELA=stripe` |
 | `TARIFA_SERVICIO_PCT` | `10` | Se usa solo si S2 no define el parámetro |
+| `SUPABASE_URL` | `https://<proyecto>.supabase.co` | Subida de fotos (D-21). Supabase → Project Settings → API → Project URL |
+| `SUPABASE_SERVICE_KEY` | llave `service_role` de Supabase | Secreto: solo en Render. Sin ella, la subida de fotos responde 503 |
+| `SUPABASE_BUCKET` | `alojamientos` | Bucket **público** de Supabase Storage |
 
 ## Base de datos (Supabase → SQL Editor, en este orden)
 El modelo sigue la página 12 de Confluence: un esquema por servicio, ids UUID, autenticación propia de S1 (D-17, sin `auth.users`).
