@@ -53,6 +53,9 @@
     guardarDisponibilidad: function (id, periodos) { return llamar('PUT', '/api/availability/' + id, { periodos: periodos }); },
     cotizar: function (cuerpo) { return llamar('POST', '/api/quotes', cuerpo); },
     reservar: function (tokenCotizacion, llave) { return llamar('POST', '/api/bookings', { tokenCotizacion: tokenCotizacion }, { 'Idempotency-Key': llave }); },
+    // Nombre del alojamiento de cada reserva: detalle público (solo publicaciones activas) o lista del anfitrión.
+    alojamientoPublico: function (id) { return llamar('GET', '/api/accommodations/' + encodeURIComponent(id)); },
+    misAlojamientos: function () { return llamar('GET', '/api/accommodations/mine'); },
     misReservas: function (page) { return llamar('GET', '/api/bookings?page=' + (page || 0) + '&size=20'); },
     recibidas: function (page) { return llamar('GET', '/api/bookings/received?page=' + (page || 0) + '&size=20'); },
     reserva: function (id) { return llamar('GET', '/api/bookings/' + id); },

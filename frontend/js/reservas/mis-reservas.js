@@ -3,6 +3,27 @@
   var L = window.ReservasLogica, A = window.ReservasApi, el = window.el;
   var $ = function (i) { return document.getElementById(i); };
   var pagina = 0, objetivo = null;
+  var nombres = {};   // id del alojamiento -> promesa con { titulo, ciudad }
+
+  // Muestra a qué alojamiento corresponde la reserva; si la publicación ya no está activa, se indica así.
+  function nombreAlojamiento(id) {
+    if (!nombres[id]) {
+      nombres[id] = A.alojamientoPublico(id).then(function (a) { return { titulo: a.titulo, ciudad: a.ciudad, activo: true }; },
+        function () { return { titulo: 'Alojamiento no disponible actualmente', ciudad: '', activo: false }; });
+    }
+    return nombres[id];
+  }
+  function encabezado(r) {
+    var cont = el('div', { clase: 'alojamiento-reserva' }, [el('span', { clase: 'suave', texto: 'Cargando alojamiento…' })]);
+    nombreAlojamiento(r.idAlojamiento).then(function (a) {
+      cont.textContent = '';
+      cont.appendChild(a.activo
+        ? el('a', { href: '../alojamientos/detalle.html?id=' + encodeURIComponent(r.idAlojamiento), texto: a.titulo })
+        : el('span', { clase: 'suave', texto: a.titulo }));
+      if (a.ciudad) cont.appendChild(el('span', { clase: 'suave', texto: ' · ' + a.ciudad }));
+    });
+    return cont;
+  }
 
   function item(r) {
     var e = L.etiquetaEstado(r.estado);
@@ -17,6 +38,7 @@
       acciones.appendChild(el('a', { clase: 'boton', href: '../resenas/resenar.html?reserva=' + encodeURIComponent(r.id), texto: 'Reseñar estancia' }));
     }
     var li = el('li', {}, [
+      encabezado(r),
       el('div', {}, [el('strong', { texto: r.fechaLlegada + ' → ' + r.fechaSalida }), ' ', el('span', { clase: 'etiqueta ' + e.clase, texto: e.texto })]),
       el('div', { clase: 'suave', texto: r.huespedes + ' huésped(es) · Total ' + L.formatearCOP(r.desglose.total) }),
       el('div', { clase: 'suave', texto: L.textoPolitica(r.politicaAplicada) }),
