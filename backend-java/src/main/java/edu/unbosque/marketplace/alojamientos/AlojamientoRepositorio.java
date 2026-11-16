@@ -261,6 +261,7 @@ public class AlojamientoRepositorio {
             p.add(f.precioMax());
         }
         for (String servicio : f.servicios()) {
+            where.append(' ');   // el text block no conserva el espacio inicial: sin esto queda "?AND" (error SQL)
             where.append("""
                      AND EXISTS (SELECT 1 FROM catalogo.alojamiento_servicio x
                                    JOIN catalogo.servicio s ON s.id = x.id_servicio
@@ -268,6 +269,7 @@ public class AlojamientoRepositorio {
             p.add(servicio.toLowerCase(Locale.ROOT));
         }
         if (f.llegada() != null && f.salida() != null) {
+            where.append(' ');   // separa el filtro anterior ("... = ?") del AND; si no, PostgreSQL falla con "$1AND"
             where.append("""
                      AND NOT EXISTS (SELECT 1 FROM reservas.reserva r
                                       WHERE r.id_alojamiento = a.id
