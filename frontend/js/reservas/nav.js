@@ -11,7 +11,7 @@
   if (rol === 'ANFITRION') enlaces.push(['../alojamientos/mis-publicaciones', 'Mis publicaciones'], ['recibidas', 'Reservas recibidas']);
   else if (rol === 'ADMINISTRADOR') enlaces.push(['../admin/dashboard', 'Panel de administración']);
   else enlaces.push(['mis-reservas', 'Mis reservas']);
-  enlaces.push(['notificaciones', 'Notificaciones']);
+  enlaces.push(['notificaciones', 'Notificaciones'], ['perfil', 'Mi perfil']);
   // Si alguien abre la sección del otro rol (por un enlace guardado), se le lleva a la suya.
   if (actual === 'mis-reservas' && rol === 'ANFITRION') { window.location.replace('recibidas.html'); return; }
   if (actual === 'recibidas' && rol === 'HUESPED') { window.location.replace('mis-reservas.html'); return; }

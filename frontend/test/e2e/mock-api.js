@@ -7,6 +7,8 @@ const RAIZ = path.resolve(__dirname, '../..');
 const ALOJ = '00000000-0000-0000-0000-0000000a0001';
 const reservas = []; const notifs = []; let periodos = [];
 let ahora = () => Date.now();
+const perfil = { id: 'u1', nombre: 'Ana Pérez', correo: 'ana@correo.com', telefono: null, documento: null, pais: 'Colombia', fotoUrl: null, rol: 'HUESPED', estado: 'ACTIVO' };
+const confirmarReservaDePrueba = () => reservas.push({ id: 'rx', llave: 'k', llegada: '2030-01-01', salida: '2030-01-03', huespedes: 1, estado: 'CONFIRMADA', total: 1, vence: 0 });
 
 function cotizar(b) {
   const noches = Math.round((Date.parse(b.fechaSalida) - Date.parse(b.fechaLlegada)) / 86400000);
@@ -59,6 +61,23 @@ function manejar(req, res, cuerpo) {
     if (m === 'PUT') { periodos = JSON.parse(cuerpo).periodos; return json(200, { idAlojamiento: g[1], periodos }); }
     return json(200, { idAlojamiento: g[1], periodos: [...periodos, ...reservas.filter((r) => r.estado === 'CONFIRMADA').map((r) => ({ fechaInicio: r.llegada, fechaFin: r.salida, tipo: 'RESERVADO' }))] });
   }
+  if (p === '/api/users/me' && m === 'GET') return json(200, perfil);
+  if (p === '/api/users/me' && m === 'PUT') {
+    const b = JSON.parse(cuerpo), det = [];
+    if (!b.nombre || b.nombre.length < 2) det.push('nombre: debe tener entre 2 y 100 caracteres.');
+    if (b.telefono && !/^\+?[0-9]{7,15}$/.test(b.telefono.replace(/[ -]/g, ''))) det.push('telefono: use entre 7 y 15 dígitos, con + opcional al inicio.');
+    if (b.nombre === 'Falla Servidor') return err(500, 'ERROR_INTERNO', 'Ocurrió un error inesperado.');
+    if (det.length) return json(400, { codigo: 'PERFIL_INVALIDO', mensaje: 'Hay datos del perfil que debe corregir.', detalles: det });
+    Object.assign(perfil, { nombre: b.nombre, telefono: b.telefono ?? null, documento: b.documento ?? null, pais: b.pais ?? null, fotoUrl: b.fotoUrl ?? null });
+    return json(200, perfil);
+  }
+  if (p === '/api/users/me/status' && m === 'PATCH') {
+    if (JSON.parse(cuerpo).estado !== 'DESACTIVADO') return err(400, 'ESTADO_INVALIDO', 'El estado debe ser ACTIVO o DESACTIVADO.');
+    const futuras = reservas.filter((r) => r.estado === 'CONFIRMADA').length;
+    if (futuras) return json(422, { codigo: 'RESERVAS_CONFIRMADAS_PENDIENTES', mensaje: 'No puede desactivar su cuenta mientras tenga reservas confirmadas futuras.', detalles: ['Reservas confirmadas futuras: ' + futuras] });
+    perfil.estado = 'DESACTIVADO';
+    return json(200, { estado: 'DESACTIVADO', sesionCerrada: true, publicacionesPausadas: 2 });
+  }
   return null;
 }
 
@@ -75,4 +94,5 @@ function iniciar(puerto) {
     }).listen(puerto, '127.0.0.1', () => ok(s));
   });
 }
-module.exports = { iniciar, ALOJ };
+const vaciarReservas = () => { reservas.length = 0; };
+module.exports = { iniciar, ALOJ, confirmarReservaDePrueba, vaciarReservas };
