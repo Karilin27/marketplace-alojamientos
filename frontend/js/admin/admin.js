@@ -69,7 +69,7 @@
     var actual = barra.getAttribute('data-actual');
     barra.appendChild(window.el('a', { clase: 'marca', href: '../../index.html', texto: 'Marketplace · Administración' }));
     [['dashboard', 'Indicadores y reportes'], ['usuarios', 'Usuarios'], ['publicaciones', 'Publicaciones'],
-      ['auditoria', 'Auditoría'], ['../resenas/moderar', 'Reseñas']].forEach(function (e) {
+      ['auditoria', 'Auditoría'], ['../resenas/moderar', 'Reseñas'], ['../reservas/perfil', 'Mi perfil']].forEach(function (e) {
       var a = window.el('a', { href: e[0] + '.html', texto: e[1] });
       if (e[0] === actual) a.setAttribute('aria-current', 'page');
       barra.appendChild(a);

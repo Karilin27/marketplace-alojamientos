@@ -57,3 +57,4 @@ jobs:
           node test/e2e/e2e.js
           node test/e2e/e2e-alojamientos.js
           node test/e2e/e2e-admin.js
+          node test/e2e/e2e-perfil.js

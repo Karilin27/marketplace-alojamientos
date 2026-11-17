@@ -126,6 +126,7 @@
       if (u && u.rol === 'ANFITRION') enlaces.push(['../reservas/recibidas', 'Reservas recibidas']);
       else if (u && u.rol === 'ADMINISTRADOR') enlaces.push(['../admin/dashboard', 'Panel de administración']);
       else enlaces.push(['../reservas/mis-reservas', 'Mis reservas']);
+      enlaces.push(['../reservas/perfil', 'Mi perfil']);
     } else enlaces.push(['../login', 'Iniciar sesión'], ['../register', 'Registrarse']);
     barra.appendChild(window.el('a', { clase: 'marca', href: '../../index.html', texto: 'Marketplace · Alojamientos' }));
     enlaces.forEach(function (e) {

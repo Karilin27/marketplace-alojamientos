@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi perfil · Marketplace de Alojamientos</title>
+  <link rel="stylesheet" href="../../css/reservas.css">
+</head>
+<body>
+  <header class="barra" id="barra" data-actual="perfil"></header>
+  <main>
+    <h1>Mi perfil</h1>
+    <div id="mensaje" role="status" aria-live="polite"></div>
+
+    <section class="card" aria-labelledby="t-datos">
+      <h2 id="t-datos">Mis datos</h2>
+      <p class="suave" id="resumen">Cargando…</p>
+      <form id="form-perfil" novalidate class="oculto">
+        <div class="fila">
+          <div>
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" type="email" readonly aria-describedby="ayuda-correo">
+            <p class="suave" id="ayuda-correo">El correo y el rol no se pueden modificar.</p>
+          </div>
+          <div>
+            <label for="rol">Rol</label>
+            <input id="rol" type="text" readonly>
+          </div>
+        </div>
+
+        <label for="nombre">Nombre completo</label>
+        <input id="nombre" name="nombre" type="text" maxlength="100" autocomplete="name" required aria-describedby="e-nombre">
+        <p class="error-campo" id="e-nombre"></p>
+
+        <div class="fila">
+          <div>
+            <label for="telefono">Teléfono (opcional)</label>
+            <input id="telefono" name="telefono" type="tel" maxlength="25" autocomplete="tel" placeholder="+573001234567" aria-describedby="e-telefono">
+            <p class="error-campo" id="e-telefono"></p>
+          </div>
+          <div>
+            <label for="documento">Documento de identidad (opcional)</label>
+            <input id="documento" name="documento" type="text" maxlength="20" aria-describedby="e-documento">
+            <p class="error-campo" id="e-documento"></p>
+          </div>
+          <div>
+            <label for="pais">País (opcional)</label>
+            <input id="pais" name="pais" type="text" maxlength="60" autocomplete="country-name" aria-describedby="e-pais">
+            <p class="error-campo" id="e-pais"></p>
+          </div>
+        </div>
+
+        <label for="fotoUrl">Foto de perfil, dirección web (opcional)</label>
+        <input id="fotoUrl" name="fotoUrl" type="url" maxlength="500" placeholder="https://…" aria-describedby="e-fotoUrl">
+        <p class="error-campo" id="e-fotoUrl"></p>
+
+        <div class="acciones">
+          <button type="submit" id="guardar" disabled>Guardar cambios</button>
+          <button type="button" class="secundario" id="descartar">Descartar cambios</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="t-cuenta" id="seccion-cuenta">
+      <h2 id="t-cuenta">Estado de la cuenta</h2>
+      <p>Estado actual: <span class="etiqueta muted" id="estado">—</span></p>
+      <p class="suave" id="aviso-cuenta">Si desactivas tu cuenta se cerrará tu sesión y tus publicaciones activas quedarán pausadas. No podrás desactivarla mientras tengas reservas confirmadas futuras. Para reactivarla, inicia sesión de nuevo y elige "Reactivar mi cuenta".</p>
+      <div class="acciones"><button type="button" class="peligro" id="desactivar" disabled>Desactivar mi cuenta</button></div>
+    </section>
+
+    <dialog id="dlg-desactivar" class="card" aria-labelledby="t-dlg">
+      <h2 id="t-dlg">Desactivar cuenta</h2>
+      <p>¿Seguro que quieres desactivar tu cuenta? Se cerrará tu sesión y tus publicaciones activas quedarán pausadas.</p>
+      <div class="acciones"><button class="peligro" id="dlg-ok" type="button">Sí, desactivar</button><button class="secundario" id="dlg-no" type="button">Volver</button></div>
+    </dialog>
+  </main>
+  <script src="../../js/reservas/config.js"></script>
+  <script src="../../js/reservas/logica.js"></script>
+  <script src="../../js/reservas/api.js"></script>
+  <script src="../../js/reservas/nav.js"></script>
+  <script src="../../js/reservas/perfil-logica.js"></script>
+  <script src="../../js/reservas/perfil.js"></script>
+</body>
+</html>

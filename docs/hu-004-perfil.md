@@ -40,6 +40,16 @@ debe borrar el token y volver al inicio de sesión.
 - Repetir el mismo estado es idempotente (200 sin cambios). Los eventos `CUENTA_DESACTIVADA`, `CUENTA_REACTIVADA` y
   `CUENTA_DESACTIVACION_RECHAZADA` van al log estructurado y a la auditoría (puerto `AuditoriaPuerto`).
 
+## Pantalla (frontend)
+
+Página `frontend/pages/reservas/perfil.html` (enlace "Mi perfil" en la barra de todas las secciones y en el inicio, para los tres roles).
+
+- **Consultar (CA-01):** al abrir carga `GET /api/users/me`; correo y rol se muestran de solo lectura.
+- **Actualizar (CA-02, CA-03):** valida en el navegador las mismas reglas del servidor (`perfil-logica.js`) y envía `PUT /api/users/me`; los errores `PERFIL_INVALIDO` se muestran junto a cada campo. "Guardar" solo se habilita si hay cambios.
+- **Desactivar (CA-05, CA-06):** botón con confirmación que llama `PATCH /api/users/me/status`; si hay reservas confirmadas futuras muestra el mensaje del servidor (422); si se desactiva, se borra la sesión del navegador y se invita a iniciar sesión.
+- **Reactivar (CA-07):** se hace desde el inicio de sesión con "Reactivar mi cuenta" (una cuenta desactivada no puede abrir esta página).
+- Pruebas: `frontend/test/perfil.test.js` (lógica) y `frontend/test/e2e/e2e-perfil.js` (navegador contra API simulada), incluidas en el CI.
+
 ## Pendientes y supuestos para confirmar
 
 1. **"Cierra su sesión" (CA-05).** El JWT no se puede revocar desde el backend. Hoy el backend responde

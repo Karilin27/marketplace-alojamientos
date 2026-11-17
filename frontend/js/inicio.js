@@ -35,7 +35,7 @@
     nav.appendChild(salir);
 
     var acciones = $('acciones-portada'); acciones.textContent = '';
-    accesos.forEach(function (a, i) { acciones.appendChild(el('a', { clase: 'boton' + (i ? ' secundario' : ''), href: a[0], texto: a[1] })); });
+    accesos.concat([['pages/reservas/perfil.html', 'Mi perfil']]).forEach(function (a, i) { acciones.appendChild(el('a', { clase: 'boton' + (i ? ' secundario' : ''), href: a[0], texto: a[1] })); });
   }
 
   // ---- Alojamientos destacados (también despierta el servidor de Render) ----
